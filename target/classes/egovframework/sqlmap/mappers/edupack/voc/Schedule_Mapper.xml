@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper
+	namespace="com.tobevoc.voc.schedule.service.mapper.ScheduleMapper">
+
+	<select id="selectSchedule" parameterType="map" resultType="map">
+		/* selectSchedule sql */
+		SELECT
+			JOB_ID
+			, JOB_NAME
+			, JOB_DATE
+			, CRON
+			, BEFORE_CRON
+			, JOB_CNTN
+			, POPUP_NOTI_YN
+			, MAIL_NOTI_YN
+			, DEL_YN
+			, REG_DATE
+			, (select name from tb_user where reg_user = user_id) as REG_USER
+			, (select name from tb_user where reg_user = user_id) as UPDATE_USER
+			, UPDATE_DATE
+			, DATE_CATEGORY
+			, SUB_CATEGORY
+			, BIMONTHLY_YN
+			, WEEK_DETAILS
+			, MONTH_DETAILS
+			, DAY_DETAILS
+			, COMPLATE_YN 
+		FROM tb_job_schedule 
+		WHERE DEL_YN = 'N'
+		<if test='COMPLATE == "Y"'>
+			AND COMPLATE_YN = 'N'
+		</if>
+		
+	</select>
+	
+<!-- 	<select id="selectMenuAuth" parameterType="map" resultType="map"> -->
+<!-- 		/* selectMenuAuth sql */ -->
+<!-- 		select NO -->
+<!-- 			 , USER_ID -->
+<!-- 			 , MENU_ID			  -->
+<!-- 			 , (SELECT NAME FROM TB_USER WHERE USER_ID = a.USER_ID ) AS USER_NAME -->
+<!-- 			 , (SELECT DEPT_CODE FROM TB_USER where USER_ID = a.USER_ID ) AS DEPT_CODE	 -->
+<!-- 		FROM TB_AUTH a -->
+<!-- 		WHERE 1=1 -->
+<!-- 			AND MENU_ID = #{MENU_ID}		 -->
+<!-- 	</select> -->
+	
+	<insert id="insertRegularSch" useGeneratedKeys="true" keyProperty="NO" parameterType="map">
+		/* insertRegularSch sql */	
+		INSERT INTO
+		tb_job_schedule 
+			( JOB_ID
+			, JOB_NAME
+			, JOB_DATE
+			, CRON
+			, BEFORE_CRON
+			, JOB_CNTN
+			, POPUP_NOTI_YN
+			, MAIL_NOTI_YN
+			, DEL_YN
+			, REG_DATE
+			, REG_USER
+			, UPDATE_DATE
+			, UPDATE_USER
+			, DATE_CATEGORY
+			, SUB_CATEGORY
+			, BIMONTHLY_YN
+			, WEEK_DETAILS
+			, MONTH_DETAILS
+			, DAY_DETAILS
+			, COMPLATE_YN )
+		VALUES 
+			( #{JOB_ID}
+			, #{JOB_NAME}
+			, #{JOB_DATE}
+			, #{CRON}
+			, #{BEFORE_CRON}
+			, #{JOB_CNTN}
+			, #{POPUP_NOTI_YN}
+			, #{MAIL_NOTI_YN}
+			, 'N'
+			, #{REG_DATE}
+			, #{REG_USER}
+			, #{UPDATE_DATE}
+			, #{UPDATE_USER}
+			, #{DATE_CATEGORY}
+			, #{SUB_CATEGORY}
+			, #{BIMONTHLY_YN}
+			, #{WEEK_DETAILS}
+			, #{MONTH_DETAILS}
+			, #{DAY_DETAILS}
+			, #{COMPLATE_YN} )		
+	</insert>
+	
+<!-- 	<insert id="saveMenu" useGeneratedKeys="true" keyProperty="MENU_NO" parameterType="map"> -->
+<!-- 		/* saveMenu sql */		 -->
+<!-- 		INSERT INTO TB_MENU -->
+<!-- 		     ( MENU_ID -->
+<!-- 		     , MENU_NAME -->
+<!-- 		     , AUTH -->
+<!-- 		     , REG_USER -->
+<!-- 		     , REG_DTTM -->
+<!-- 		     , ETC1 -->
+<!-- 		     , ETC2 -->
+<!-- 		     , ETC3 -->
+<!-- 		     , UP_MENU -->
+<!-- 		     , MENU_URL -->
+<!-- 		     , USE_YN -->
+<!-- 		     ) -->
+<!-- 		 VALUES -->
+<!-- 		     ( #{MENU_ID} -->
+<!-- 		     , #{MENU_NAME} -->
+<!-- 		     , #{AUTH} -->
+<!-- 		     , #{REG_USER} -->
+<!-- 		     , #{REG_DTTM} -->
+<!-- 		     , #{ETC1} -->
+<!-- 			 , #{ETC2} -->
+<!-- 			 , #{ETC3} -->
+<!-- 			 , #{UP_MENU} -->
+<!-- 			 , #{MENU_URL} -->
+<!-- 			 , #{USE_YN}) -->
+<!-- 	</insert> -->
+	
+	<update id="deleteRegularSch" parameterType="map">
+		/* deleteRegularSch sql */	
+		UPDATE tb_job_schedule
+		   SET DEL_YN = 'Y'
+		   , UPDATE_USER = #{UPDATE_USER}
+		   , UPDATE_DATE = #{UPDATE_DATE}
+		 WHERE JOB_ID = #{JOB_ID}
+	</update>
+	
+<!-- 	<update id="deleteMenu" parameterType="String"> -->
+<!-- 		/* deleteMenu sql */	 -->
+<!-- 		UPDATE TB_MENU -->
+<!-- 		  SET USE_YN = 'N' -->
+<!-- 		 WHERE MENU_NO = #{MENU_NO} -->
+<!-- 	</update> -->
+	
+<!-- 	<delete id="deleteMenuAuth" parameterType="map"> -->
+<!-- 		/* deleteMenuAuth sql */	 -->
+<!-- 		DELETE -->
+<!-- 		 FROM TB_AUTH -->
+<!-- 		 WHERE MENU_ID = #{MENU_ID} -->
+<!-- 		 <if test="USER_ID != null and USER_ID != ''"> -->
+<!-- 		 AND USER_ID = #{USER_ID} -->
+<!-- 		 </if> -->
+<!-- 	</delete> -->
+
+</mapper>

@@ -1,0 +1,121 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<FDL version="2.1">
+  <Form id="cmmHistoryVoc" width="620" height="400" titletext="VOC 내역조회" onload="cmmHistoryVoc_onload">
+    <Layouts>
+      <Layout height="400" width="620">
+        <Static id="title_stat" taborder="0" text="VOC 변경 내역조회" left="10" top="10" width="147" height="18" onclick="Static01_onclick" cssclass="sta_WF_FrmTitle"/>
+        <Grid id="dept_grid" taborder="1" left="5" top="38" width="609" height="352" binddataset="dsVocHistory" oncelldblclick="Grid00_oncelldblclick">
+          <Formats>
+            <Format id="default">
+              <Columns>
+                <Column size="37"/>
+                <Column size="143"/>
+                <Column size="78"/>
+                <Column size="78"/>
+                <Column size="90"/>
+                <Column size="280"/>
+                <Column size="90"/>
+                <Column size="155"/>
+              </Columns>
+              <Rows>
+                <Row size="24" band="head"/>
+                <Row size="24"/>
+              </Rows>
+              <Band id="head">
+                <Cell text="NO"/>
+                <Cell col="1" text="내역 상태"/>
+                <Cell col="2" text="담당자"/>
+                <Cell col="3" text="변경 담당자"/>
+                <Cell col="4" text="등록일"/>
+                <Cell col="5" text="상세 내역"/>
+                <Cell col="6" text="종결일"/>
+                <Cell col="7" text="담당자 변경 상세사유"/>
+              </Band>
+              <Band id="body">
+                <Cell text="expr:dataset.rowcount - rowidx"/>
+                <Cell col="1" text="bind:HISTORY_STAT" combodataset="dsHistoryStat" combocodecol="CODE" combodatacol="CODE_NAME" displaytype="combotext"/>
+                <Cell col="2" text="bind:CHRG_USER"/>
+                <Cell col="3" text="bind:REQ_CHRG_USER"/>
+                <Cell col="4" text="bind:REG_DTTM" displaytype="date" calendardateformat="yyyy-MM-dd"/>
+                <Cell col="5" text="bind:REQ_CNTN"/>
+                <Cell col="6" text="bind:END_DTTM" calendardateformat="yyyy-MM-dd" displaytype="date" calendardisplaynulltype="none"/>
+                <Cell col="7" text="bind:MEMO"/>
+              </Band>
+            </Format>
+          </Formats>
+        </Grid>
+      </Layout>
+    </Layouts>
+    <Objects>
+      <Dataset id="dsSearch">
+        <ColumnInfo>
+          <Column id="CUST_NAME" type="STRING" size="256"/>
+          <Column id="CUST_ID" type="STRING" size="256"/>
+          <Column id="VOC_ID" type="STRING" size="256"/>
+        </ColumnInfo>
+        <Rows>
+          <Row/>
+        </Rows>
+      </Dataset>
+      <Dataset id="dsVocHistory">
+        <ColumnInfo>
+          <Column id="VOC_ID" type="STRING" size="256"/>
+          <Column id="HISTORY_STAT" type="STRING" size="256"/>
+          <Column id="CHRG_USER" type="STRING" size="256"/>
+          <Column id="REQ_CHRG_USER" type="STRING" size="256"/>
+          <Column id="END_DTTM" type="STRING" size="256"/>
+          <Column id="REG_DTTM" type="STRING" size="256"/>
+          <Column id="REQ_CNTN" type="STRING" size="256"/>
+          <Column id="MEMO" type="STRING" size="256"/>
+          <Column id="CHRG_USER_ID" type="STRING" size="256"/>
+          <Column id="REQ_CHRG_USER_ID" type="STRING" size="256"/>
+        </ColumnInfo>
+      </Dataset>
+      <Dataset id="dsHistoryStat">
+        <ColumnInfo>
+          <Column id="CODE" type="STRING" size="256"/>
+          <Column id="CODE_NAME" type="STRING" size="256"/>
+        </ColumnInfo>
+      </Dataset>
+    </Objects>
+    <Script type="xscript5.1"><![CDATA[/************************************************************************************************
+* FORM 변수 선언 영역
+************************************************************************************************/
+
+
+/************************************************************************************************
+* FORM EVENT 영역(onload, onbeforeclose)
+************************************************************************************************/
+this.cmmHistoryVoc_onload = function(obj:nexacro.Form,e:nexacro.LoadEventInfo)
+{
+	var sParam1 = this.parent.vocId;
+	this.selectHistory(sParam1);
+	
+};
+
+
+/************************************************************************************************
+* TRANSACTION 영역
+************************************************************************************************/
+/* selectHistory */
+this.selectHistory = function(sParam1){	
+	
+	this.dsSearch.setColumn(0, "VOC_ID", sParam1);
+
+	var strSvcId    = "selectHistory";
+	var strSvcUrl   = "svcUrl::selectHistory.do";
+	var inData      = "dsSearch=dsSearch";
+	var outData     = "dsVocHistory=dsVocHistory dsHistoryStat=dsHistoryStat";
+	var strArg      = "";
+	var callBackFnc = "fnCallback";
+	
+	this.transaction(strSvcId 
+		,strSvcUrl
+		,inData
+		,outData
+		,strArg
+		,callBackFnc);
+}
+]]></Script>
+  </Form>
+</FDL>

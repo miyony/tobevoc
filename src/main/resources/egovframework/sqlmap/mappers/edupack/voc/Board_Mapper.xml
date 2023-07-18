@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >	
+
+<mapper namespace="com.tobevoc.voc.board.service.mapper.BoardMapper">  	
+		
+	<select id="selectNotice" parameterType="map" resultType="map">
+		/* selectNotice sql */
+		select B.* 
+		FROM (select @rw:=@rw+1 as rownum, A.*
+		FROM (SELECT NO
+			 , TITLE
+			 , REG_USER
+			 , (SELECT NAME FROM TB_USER WHERE USER_ID = REG_USER) AS REG_USER_NAME
+			 , REG_DTTM
+			 , ATTACH_YN
+			 , CATEGORY
+			 , NOTICE_YN
+			 , HIT_CNT
+			 , UPDATE_USER
+			 , (SELECT NAME FROM TB_USER WHERE USER_ID = UPDATE_USER) AS UPDATE_USER_NAME
+		     , UPDATE_DTTM
+		FROM TB_BOARD
+		WHERE DEL_YN = 'N'
+		AND GUBUN = #{GUBUN}
+		<if test="REG_USER != null and REG_USER != ''">
+			AND REG_USER = #{REG_USER}
+		</if>
+		<if test="TITLE != null and TITLE != ''">
+			AND TITLE LIKE CONCAT('%', #{TITLE},'%')
+		</if>
+		<if test="STAR_DTTM != null and STAR_DTTM != ''">
+			AND UPDATE_DTTM BETWEEN #{STAR_DTTM} AND #{END_DTTM}
+		</if>
+		ORDER BY NO DESC, REG_DTTM DESC) A,
+		(select @rw:=0) as r) B
+		ORDER BY rownum DESC limit #{records} offset #{recordsOffset}
+	</select>
+	
+	<select id="selectBottomNotice" resultType="map">
+		/* selectBottomNotice sql */
+		SELECT NO
+			 , TITLE
+			 , POST_DTTM
+		FROM TB_BOARD
+		WHERE DEL_YN = 'N'
+		AND GUBUN = '01'
+		AND NOTICE_YN = 'Y'
+		AND REG_DTTM BETWEEN SUBSTR(POST_DTTM,  1, 8) AND SUBSTR(POST_DTTM,  10, 8)
+		ORDER BY REG_DTTM
+	</select>
+	
+	<select id="selectBoardCount" parameterType="map" 	resultType="map">
+		select count(*) as totalCount
+		FROM TB_BOARD
+		WHERE DEL_YN = 'N'
+		AND GUBUN = #{GUBUN}
+		<if test="REG_USER != null and REG_USER != ''">
+			AND REG_USER LIKE CONCAT('%', #{REG_USER},'%')
+		</if>
+		<if test="TITLE != null and TITLE != ''">
+			AND TITLE LIKE CONCAT('%', #{TITLE},'%')
+		</if>
+		<if test="STAR_DTTM != null and STAR_DTTM != ''">
+			AND REG_DTTM BETWEEN #{STAR_DTTM} AND #{END_DTTM}
+		</if>
+		ORDER BY NO DESC, REG_DTTM DESC;
+	</select>
+	
+	<select id="detailBoard" parameterType="String" resultType="map">
+		/* detailBoard sql */
+		select NO
+			 , TITLE
+			 , CNTN
+			 , REG_USER
+			 , REG_DTTM
+			 , ATTACH_YN
+			 , CATEGORY
+			 , NOTICE_YN
+			 , HIT_CNT
+			 , POST_DTTM
+			 , UPDATE_USER
+		     , UPDATE_DTTM
+		FROM TB_BOARD
+		WHERE DEL_YN = 'N'
+		AND NO = #{no}		
+	</select>
+	
+	<insert id="insertBoard" useGeneratedKeys="true" keyProperty="NO" parameterType="map">
+		/* insertBoard sql */	
+		INSERT INTO TB_BOARD
+		     ( NO
+		     , GUBUN
+		     , TITLE
+		     , CNTN
+		     , REG_DTTM
+		     , REG_USER
+		     , DEL_YN
+		     , ATTACH_YN
+		     , CATEGORY
+		     , NOTICE_YN
+		     , HIT_CNT
+		     , POST_DTTM
+		     , UPDATE_USER
+		     , UPDATE_DTTM
+		     )
+		 VALUES 
+		     ( #{NO}
+			 , #{GUBUN}
+			 , #{TITLE}
+			 , #{CNTN}
+			 , #{REG_DTTM}
+			 , #{REG_USER}
+			 , #{DEL_YN}
+			 , #{ATTACH_YN}
+			 , #{CATEGORY}
+			 , #{NOTICE_YN}
+			 , #{HIT_CNT}
+			 , #{POST_DTTM}
+			 , #{UPDATE_USER}
+			 , #{UPDATE_DTTM}
+			  )  
+	</insert>
+	
+	<update id="updateBoard" parameterType="map">
+		/* updateBoard sql */	
+		UPDATE TB_BOARD
+		   SET TITLE = #{TITLE}
+		     , CNTN = #{CNTN}
+		     , ATTACH_YN = #{ATTACH_YN}
+		     , CATEGORY = #{CATEGORY}
+		     , NOTICE_YN = #{NOTICE_YN}
+		     , POST_DTTM = #{POST_DTTM}
+		     , UPDATE_USER = #{UPDATE_USER}
+		     , UPDATE_DTTM = #{UPDATE_DTTM}
+		 WHERE NO = #{NO}
+	</update>
+	
+	<delete id="deleteBoard" parameterType="map">
+		/* deleteBoard sql */	
+		UPDATE TB_BOARD
+		  SET DEL_YN = 'Y'
+		 WHERE NO = #{NO}
+	</delete>
+	
+	
+</mapper>

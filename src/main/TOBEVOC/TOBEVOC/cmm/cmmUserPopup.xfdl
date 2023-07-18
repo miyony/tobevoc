@@ -1,0 +1,143 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<FDL version="2.1">
+  <Form id="cmmUserPopup" width="330" height="400" titletext="사원 조회" onload="cmmUserPopup_onload">
+    <Layouts>
+      <Layout height="400" width="330">
+        <Static id="title_stat" taborder="0" text="사원 조회" left="10" top="10" width="107" height="18" onclick="Static01_onclick" cssclass="sta_WF_FrmTitle"/>
+        <Div id="Div00" taborder="1" text="" left="9" top="40" width="313" height="50" cssclass="sta_WF_box01">
+          <Layouts>
+            <Layout>
+              <Static id="sub_stat" taborder="0" text="성명" left="4" top="8" width="58" height="30" cssclass="sta_WF_LabelTxt"/>
+              <Edit id="search_edit" taborder="1" left="57" top="9" width="249" height="30"/>
+            </Layout>
+          </Layouts>
+        </Div>
+        <Button id="btn_select" taborder="2" text="조회" top="5" width="65" height="30" right="7" onclick="btn_select_onclick" cssclass="btn_WF_basic02"/>
+        <Grid id="user_grid" taborder="3" left="7" top="99" width="315" height="292" binddataset="dsUser" oncelldblclick="Grid00_oncelldblclick">
+          <Formats>
+            <Format id="default">
+              <Columns>
+                <Column size="40"/>
+                <Column size="87"/>
+                <Column size="92"/>
+                <Column size="93"/>
+              </Columns>
+              <Rows>
+                <Row size="24" band="head"/>
+                <Row size="24"/>
+              </Rows>
+              <Band id="head">
+                <Cell text="NO"/>
+                <Cell col="1" text="이름"/>
+                <Cell col="2" text="부서"/>
+                <Cell col="3" text="직위"/>
+              </Band>
+              <Band id="body">
+                <Cell text="expr:dataset.rowcount - rowidx" textAlign="center"/>
+                <Cell col="1" text="bind:NAME"/>
+                <Cell col="2" displaytype="combotext" combodataset="dsDept" combocodecol="DEPT_CD" combodatacol="DEPT_NAME" text="bind:DEPT_CODE"/>
+                <Cell col="3" text="bind:POS_CODE" displaytype="combotext" combodataset="dsPos" combocodecol="POS_CD" combodatacol="POS_NAME"/>
+              </Band>
+            </Format>
+          </Formats>
+        </Grid>
+      </Layout>
+    </Layouts>
+    <Objects>
+      <Dataset id="dsUser">
+        <ColumnInfo>
+          <Column id="USER_ID" type="STRING" size="256"/>
+          <Column id="NAME" type="STRING" size="256"/>
+          <Column id="DEPT_CODE" type="STRING" size="256"/>
+          <Column id="POS_CODE" type="STRING" size="256"/>
+        </ColumnInfo>
+      </Dataset>
+      <Dataset id="dsDept">
+        <ColumnInfo>
+          <Column id="DEPT_CD" type="STRING" size="256"/>
+          <Column id="DEPT_NAME" type="STRING" size="256"/>
+          <Column id="UP_DEPT" type="STRING" size="256"/>
+          <Column id="LEVEL" type="STRING" size="256"/>
+        </ColumnInfo>
+      </Dataset>
+      <Dataset id="dsPos">
+        <ColumnInfo>
+          <Column id="POS_CD" type="STRING" size="256"/>
+          <Column id="POS_NAME" type="STRING" size="256"/>
+        </ColumnInfo>
+      </Dataset>
+      <Dataset id="dsSearch">
+        <ColumnInfo>
+          <Column id="POS_CODE" type="STRING" size="256"/>
+          <Column id="NAME" type="STRING" size="256"/>
+          <Column id="DEPT_CODE" type="STRING" size="256"/>
+        </ColumnInfo>
+        <Rows>
+          <Row/>
+        </Rows>
+      </Dataset>
+    </Objects>
+    <Script type="xscript5.1"><![CDATA[/************************************************************************************************
+* FORM 변수 선언 영역
+************************************************************************************************/
+
+/************************************************************************************************
+* FORM EVENT 영역(onload, onbeforeclose)
+************************************************************************************************/
+
+this.cmmUserPopup_onload = function(obj:nexacro.Form,e:nexacro.LoadEventInfo)
+{
+	var sParam1 = this.parent.pStr1;
+	this.selectUser(sParam1);
+	
+	var aa = "안녕";
+};
+
+/************************************************************************************************
+* 버튼 영역
+************************************************************************************************/
+/* 조회 버튼 */
+this.btn_select_onclick = function(obj:nexacro.Button,e:nexacro.ClickEventInfo)
+{
+	var sParam1 = this.Div00.form.search_edit.text;
+	this.selectUser(sParam1);
+};
+
+/************************************************************************************************
+* TRANSACTION 영역
+************************************************************************************************/
+/* selectUser */
+this.selectUser = function(sParam1){	
+	this.dsSearch.setColumn(0, "NAME",sParam1);
+	this.dsSearch.setColumn(0, "DEPT_CODE",this.parent.deptCode);
+	
+	var strSvcId    = "selectUser";
+	var strSvcUrl   = "svcUrl::selectUser.do";
+	var inData      = "dsSearch=dsSearch";
+	var outData     = "dsUser=dsUser dsPos=dsPos dsDept=dsDept";
+	var strArg      = "";
+	var callBackFnc = "fnCallback";
+	
+	this.transaction(strSvcId 
+		,strSvcUrl
+		,inData
+		,outData
+		,strArg
+		,callBackFnc);
+
+}
+
+/************************************************************************************************
+* 사용자 FUNCTION 영역
+************************************************************************************************/
+/* grid 더블 클릭 시 */
+this.Grid00_oncelldblclick = function(obj:nexacro.Grid,e:nexacro.GridClickEventInfo)
+{
+	var sCode = this.dsUser.getColumn(e.row, "NAME")+":"+this.dsUser.getColumn(e.row, "USER_ID")+":"+this.dsUser.getColumn(e.row, "DEPT_CODE");
+	this.close(sCode);
+	
+};
+
+]]></Script>
+  </Form>
+</FDL>

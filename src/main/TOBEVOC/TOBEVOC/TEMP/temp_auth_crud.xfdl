@@ -1,0 +1,359 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<FDL version="2.1">
+  <Form id="temp_aut_crud" width="1050" height="770" titletext="권한 관리" onload="temp_menu_crud_onload">
+    <Layouts>
+      <Layout height="770" width="1050">
+        <Static id="Static00" taborder="0" text="W10" left="0" top="0" width="5" height="720" visible="false" background="pink"/>
+        <Static id="Static00_00" taborder="1" text="W10" left="1040" top="0" width="10" height="720" visible="false" background="pink"/>
+        <Static id="title_stat" taborder="2" text="권한 관리" left="10" top="10" width="150" height="19" cssclass="sta_WF_FrmTitle"/>
+        <Button id="btn_save" taborder="3" text="등록" top="5" width="65" height="30" right="6" onclick="btn_save_onclick" cssclass="btn_WF_basic02"/>
+        <Button id="del_btn" taborder="4" text="삭제" top="5" width="65" height="30" right="79" font="13px/normal &quot;Verdana&quot;,&quot;Malgun Gothic&quot;" onclick="del_btn_onclick" cssclass="btn_WF_basic02"/>
+        <Static id="sub_stat14" taborder="5" text="메뉴정보" left="526" top="28" width="89" height="50" cssclass="sta_WF_SubtitleDown"/>
+        <Static id="sub_stat4" taborder="6" text="사용여부" left="523" top="157" width="120" height="42" cssclass="sta_WF_DetailLabel"/>
+        <Static id="sub_stat2" taborder="7" text="메뉴 ID" left="523" top="75" width="120" height="42" cssclass="sta_WF_DetailEssential"/>
+        <Static id="sub_stat10" taborder="8" text="" left="642" top="157" width="398" height="42" cssclass="sta_WF_DetailArea"/>
+        <Radio id="useYn_radio" taborder="9" left="650" top="163" width="260" height="30" index="0" text="" value="" innerdataset="innerdataset" codecolumn="codecolumn" datacolumn="datacolumn" rowcount="1" enable="false" onitemchanged="useYn_radio_onitemchanged">
+          <Dataset id="innerdataset">
+            <ColumnInfo>
+              <Column id="codecolumn" size="256"/>
+              <Column id="datacolumn" size="256"/>
+            </ColumnInfo>
+            <Rows>
+              <Row>
+                <Col id="codecolumn">Y</Col>
+                <Col id="datacolumn">사용</Col>
+              </Row>
+              <Row>
+                <Col id="codecolumn">N</Col>
+                <Col id="datacolumn">미사용</Col>
+              </Row>
+            </Rows>
+          </Dataset>
+        </Radio>
+        <Static id="sub_stat3" taborder="10" text="메뉴명" left="523" top="116" width="120" height="42" cssclass="sta_WF_DetailEssential"/>
+        <Static id="sub_stat8" taborder="11" text="" left="642" top="75" width="398" height="42" cssclass="sta_WF_DetailArea"/>
+        <Static id="sub_stat9" taborder="12" text="" left="642" top="116" width="398" height="42" cssclass="sta_WF_DetailArea"/>
+        <Grid id="menu_grid" taborder="13" left="6" top="75" width="507" height="685" binddataset="dsMenu" treeinitstatus="expand,all" treeusecheckbox="false" treeuseline="false" treeuseimage="true" oncellclick="menu_grid_oncellclick">
+          <Formats>
+            <Format id="default">
+              <Columns>
+                <Column size="500"/>
+              </Columns>
+              <Rows>
+                <Row size="33"/>
+              </Rows>
+              <Band id="body">
+                <Cell displaytype="treeitemcontrol" edittype="tree" text="bind:MENU_NAME" treelevel="bind:LEVEL" tooltiptext="bind:MENU_NAME" treestartlevel="0"/>
+              </Band>
+            </Format>
+          </Formats>
+        </Grid>
+        <Static id="sub_stat1" taborder="14" text="메뉴" left="10" top="28" width="74" height="50" cssclass="sta_WF_SubtitleDown"/>
+        <Edit id="menu_name_edit" taborder="15" left="648" top="122" width="260" height="30" enable="false"/>
+        <Edit id="menu_id_edit" taborder="16" left="648" top="81" width="260" height="30" enable="false"/>
+        <Static id="sub_stat16" taborder="17" text="" left="642" top="198" width="398" height="42" cssclass="sta_WF_DetailArea"/>
+        <Edit id="menu_url_edit" taborder="18" left="648" top="204" width="260" height="30" enable="false"/>
+        <Static id="sub_stat15" taborder="19" text="메뉴 URL" left="523" top="198" width="120" height="42" cssclass="sta_WF_DetailLabel"/>
+        <Static id="sub_stat17" taborder="20" text="권한정보" left="526" top="240" width="139" height="50" cssclass="sta_WF_SubtitleDown"/>
+        <Static id="sub_stat2_00" taborder="21" text="사용자 추가" left="523" top="289" width="125" height="43" cssclass="sta_WF_DetailEssential"/>
+        <Static id="sub_stat8_00" taborder="22" text="" left="642" top="289" width="398" height="43" cssclass="sta_WF_DetailArea"/>
+        <Edit id="user_name_edit" taborder="23" left="648" top="295" width="231" height="30" enable="true"/>
+        <Button id="search_btn" taborder="24" left="879" top="295" width="31" height="30" cssclass="btn_WF_inquiry" onclick="search_btn_onclick"/>
+        <Grid id="auth_user_grid" taborder="25" left="523" top="339" width="388" height="421" binddataset="dsUser" scrolltype="vertical" scrollbartype="auto auto">
+          <Formats>
+            <Format id="default">
+              <Columns>
+                <Column size="128"/>
+                <Column size="105"/>
+                <Column size="153"/>
+              </Columns>
+              <Rows>
+                <Row size="26" band="head"/>
+                <Row size="26"/>
+              </Rows>
+              <Band id="head">
+                <Cell text="사용자 ID"/>
+                <Cell col="1" text="성함"/>
+                <Cell col="2" text="부서"/>
+              </Band>
+              <Band id="body">
+                <Cell text="bind:USER_ID"/>
+                <Cell col="1" text="bind:USER_NAME"/>
+                <Cell col="2" text="bind:DEPT_CODE" displaytype="combotext" combodataset="dsDept" combocodecol="DEPT_CD" combodatacol="DEPT_NAME"/>
+              </Band>
+            </Format>
+          </Formats>
+        </Grid>
+      </Layout>
+    </Layouts>
+    <Script type="xscript5.1"><![CDATA[
+/************************************************************************************************
+* FORM 변수 선언 영역
+************************************************************************************************/
+this.objApp = nexacro.getApplication();
+
+
+/************************************************************************************************
+* FORM EVENT 영역(onload, onbeforeclose)
+************************************************************************************************/
+
+this.temp_menu_crud_onload = function(obj:nexacro.Form,e:nexacro.LoadEventInfo)
+{
+	this.selectMenu();	
+};
+
+/************************************************************************************************
+* 버튼 영역
+************************************************************************************************/
+
+/* 삭제 버튼 */
+this.del_btn_onclick = function(obj:nexacro.Button,e:nexacro.ClickEventInfo)
+{
+	if(this.confirm("권한을 삭제하시겠습니까?")){
+		if(this.dsUser.getColumn(this.dsUser.rowposition, "NO") == null){
+			this.dsUser.deleteRow(this.dsUser.rowposition);
+			
+		}else{
+			var delNo = this.dsMenu.getColumn(this.dsMenu.rowposition, "MENU_ID");
+			var id  = this.dsUser.getColumn(this.dsUser.rowposition, "USER_ID");
+			
+			this.dsList.setColumn(0, "MENU_ID", delNo);
+			this.dsList.setColumn(0, "USER_ID", id);
+			
+			this.deleteMenuAuth();	
+		}
+	}	
+};
+
+/* 저장 버튼 */
+this.btn_save_onclick = function(obj:nexacro.Button,e:nexacro.ClickEventInfo)
+{
+	if(this.confirm("등록하시겠습니까?")){
+		if(this.dsUser.rowcount == 0){
+			alert("등록된 사용자가 없습니다");
+		}else{
+			this.saveMenuAuth()
+		}
+		
+	}
+	
+};
+
+
+/************************************************************************************************
+* TRANSACTION 영역
+************************************************************************************************/
+/* selectMenu */
+this.selectMenu = function(){
+	
+	var userId = "";
+	
+	var strSvcId    = "selectMenu";
+	var strSvcUrl   = "svcUrl::selectMenu.do";
+	var inData      = "";
+	var outData     = "dsMenu=dsMenu";
+	var strArg      = "userId="+userId;
+	var callBackFnc = "fnCallback";
+	
+	this.transaction(strSvcId 
+		,strSvcUrl
+		,inData
+		,outData
+		,strArg
+		,callBackFnc);	
+}
+
+/* menuAuthSelect */
+this.selectMenuAuth = function(menuId){
+	
+	var strSvcId    = "selectMenuAuth";
+	var strSvcUrl   = "svcUrl::selectMenuAuth.do";
+	var inData      = "";
+	var outData     = "dsUser=dsUser dsDept=dsDept";
+	var strArg      = "menuId=" + menuId;
+	var callBackFnc = "fnCallback";
+	
+	this.transaction(strSvcId 
+		,strSvcUrl
+		,inData
+		,outData
+		,strArg
+		,callBackFnc);	
+	
+}
+
+/* saveMenu */
+this.saveMenuAuth = function(){
+	
+	var strSvcId    = "insertMenuAuth";
+	var strSvcUrl   = "svcUrl::insertMenuAuth.do";
+	var inData      = "dsUser=dsUser:u";
+	var outData     = "";
+	var strArg      = "";
+	var callBackFnc = "fnCallback";
+	
+	this.transaction(strSvcId 
+		,strSvcUrl
+		,inData
+		,outData
+		,strArg
+		,callBackFnc);			
+}
+
+/* deleteMenu */
+this.deleteMenuAuth = function(){
+	
+	var strSvcId    = "deleteMenuAuth";
+	var strSvcUrl   = "svcUrl::deleteMenuAuth.do";
+	var inData      = "dsList=dsList";
+	var outData     = "";
+	var strArg      = "";
+	var callBackFnc = "fnCallback";
+	
+	this.transaction(strSvcId 
+		,strSvcUrl
+		,inData
+		,outData
+		,strArg
+		,callBackFnc);			
+}
+
+
+
+this.fnCallback = function(svcID, errorCode, errorMsg)
+{
+	switch(svcID) {
+		
+	case "selectMenu":
+		//trace(this.dsMenu.saveXML());
+		
+		return;
+		
+		
+	case "selectMenuAuth":
+		
+		return;
+		
+	case "insertMenuAuth":
+		alert("등록되었습니다");
+		this.selectMenu();
+		
+		return;
+		
+	case "deleteMenuAuth":
+		alert("삭제되었습니다");
+		this.selectMenu();
+			
+		return;
+	}
+};
+
+
+/************************************************************************************************
+* 사용자 FUNCTION 영역
+************************************************************************************************/
+this.menu_grid_oncellclick = function(obj:nexacro.Grid,e:nexacro.GridClickEventInfo)
+{
+	
+	var objDs = this.menu_grid.getBindDataset();
+	var menuId = objDs.getColumn(e.row, "MENU_ID");
+	this.selectMenuAuth(menuId);
+};
+
+this.search_btn_onclick = function(obj:nexacro.Button,e:nexacro.ClickEventInfo)
+{
+	var objCF = new ChildFrame();
+	
+	objCF.init("userSearch", 0, 0, 300, 400, null, null, "cmm::cmmUserPopup.xfdl"); // 초기값 세팅 	
+	objCF.set_showtitlebar(true);
+	objCF.set_openalign("center middle"); // childFrame의 위치를 지정하는 속성, 중간에 화면을 위치시킴
+	objCF.set_showstatusbar(false);
+	var objUser = { pStr1 : this.user_name_edit.value};
+	
+	objCF.showModal( this.getOwnerFrame(), objUser, this, "fn_popupSearch" ); 
+};
+
+
+this.fn_popupSearch = function(sPopId, sRtn){
+	
+	var obj = this.auth_user_grid.getBindDataset();	
+	
+	if(sPopId == "userSearch"){
+		if( sRtn.length> 0 ){
+			var arrRtn = sRtn.split(":");
+			
+			
+			for( var i = 0; i < obj.rowcount; i++){
+				var name = obj.getColumn(i, "USER_NAME");
+				if( name == arrRtn[0]){
+					alert("중복된 사용자 입니다.");
+					return;
+				}				
+			}
+			var nRow = obj.addRow();
+			var menuId = this.dsMenu.getColumn(this.dsMenu.rowposition, "MENU_ID");
+			
+			obj.setColumn(nRow, "MENU_ID", menuId);		
+			obj.setColumn(nRow, "USER_NAME", arrRtn[0]);
+			obj.setColumn(nRow, "USER_ID", arrRtn[1]);
+			obj.setColumn(nRow, "DEPT_CODE", arrRtn[2]);
+			
+		}		
+	}
+};
+
+this.useYn_radio_onitemchanged = function(obj:nexacro.Radio,e:nexacro.ItemChangeEventInfo)
+{
+	
+};
+]]></Script>
+    <Objects>
+      <Dataset id="dsMenu">
+        <ColumnInfo>
+          <Column id="MENU_ID" type="STRING" size="256"/>
+          <Column id="MENU_NAME" type="STRING" size="256"/>
+          <Column id="AUTH" type="STRING" size="256"/>
+          <Column id="etc1" type="STRING" size="256"/>
+          <Column id="etc2" type="STRING" size="256"/>
+          <Column id="etc3" type="STRING" size="256"/>
+          <Column id="UP_MENU" type="STRING" size="256"/>
+          <Column id="LEVEL" type="STRING" size="256"/>
+          <Column id="MENU_URL" type="STRING" size="256"/>
+          <Column id="USE_YN" type="STRING" size="256"/>
+        </ColumnInfo>
+      </Dataset>
+      <Dataset id="dsUser">
+        <ColumnInfo>
+          <Column id="USER_ID" type="STRING" size="256"/>
+          <Column id="USER_NAME" type="STRING" size="256"/>
+          <Column id="DEPT_CODE" type="STRING" size="256"/>
+          <Column id="MENU_ID" type="STRING" size="256"/>
+          <Column id="NO" type="STRING" size="256"/>
+        </ColumnInfo>
+      </Dataset>
+      <Dataset id="dsDept">
+        <ColumnInfo>
+          <Column id="DEPT_CD" type="STRING" size="256"/>
+          <Column id="DEPT_NAME" type="STRING" size="256"/>
+          <Column id="UP_DEPT" type="STRING" size="256"/>
+          <Column id="LEVEL" type="STRING" size="256"/>
+        </ColumnInfo>
+      </Dataset>
+      <Dataset id="dsList">
+        <ColumnInfo>
+          <Column id="MENU_ID" type="STRING" size="256"/>
+          <Column id="USER_ID" type="STRING" size="256"/>
+        </ColumnInfo>
+        <Rows>
+          <Row/>
+        </Rows>
+      </Dataset>
+    </Objects>
+    <Bind>
+      <BindItem id="item7" compid="useYn_radio" propid="value" datasetid="dsMenu" columnid="USE_YN"/>
+      <BindItem id="item0" compid="menu_id_edit" propid="value" datasetid="dsMenu" columnid="MENU_ID"/>
+      <BindItem id="item1" compid="menu_name_edit" propid="value" datasetid="dsMenu" columnid="MENU_NAME"/>
+      <BindItem id="item3" compid="menu_url_edit" propid="value" datasetid="dsMenu" columnid="MENU_URL"/>
+    </Bind>
+  </Form>
+</FDL>

@@ -1,0 +1,8 @@
+﻿{
+admin off
+}
+:4098
+{
+root "C:/EduPack/workspace/edupack_egov/src/main/webapp/TOBEVOC"
+file_server
+}

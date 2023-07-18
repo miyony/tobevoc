@@ -1,0 +1,193 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<FDL version="2.1">
+  <Form id="Form_Left" width="225" height="940" titletext="Form_Left" onload="Form_Left_onload" scrollbartype="none none">
+    <Layouts>
+      <Layout width="225" height="940" screenid="Desktop_screen">
+        <Grid id="Grid00" taborder="0" left="0" top="36" binddataset="dsMenu" treeusecheckbox="false" treeinitstatus="expand,all" right="0" bottom="424" enable="true" oncellclick="Grid00_oncellclick" treeuseline="false" cssclass="grd_LF_Menu" scrolltype="none" scrollbartype="none none" font="14px/normal &quot;Cafe24SsurroundAir&quot;,&quot;Cafe24SsurroundAir&quot;">
+          <Formats>
+            <Format id="default">
+              <Columns>
+                <Column size="226"/>
+              </Columns>
+              <Rows>
+                <Row size="30"/>
+              </Rows>
+              <Band id="body">
+                <Cell text="bind:MENU_NAME" displaytype="treeitemcontrol" edittype="tree" tooltiptext="bind:MENU_NAME" treelevel="bind:LEVEL" cssclass="expr:level=='1'? &quot;lev0&quot;:level=='2'? &quot;lev1&quot;:&quot;&quot;" treestartlevel="0" font="14px/normal &quot;Cafe24SsurroundAir&quot;,&quot;Cafe24SsurroundAir&quot;"/>
+              </Band>
+            </Format>
+            <Format id="mymenu">
+              <Columns>
+                <Column size="205"/>
+              </Columns>
+              <Rows>
+                <Row size="24"/>
+              </Rows>
+              <Band id="body">
+                <Cell text="bind:MENU_NAME"/>
+              </Band>
+            </Format>
+          </Formats>
+        </Grid>
+        <Static id="Static_Day00" taborder="2" text="✨REGULAR WORK" cssclass="sta_WF_widgetBox01" left="0" top="Grid00:0" width="225" height="30" style="padding:3 0 0 15;" font="14px/normal &quot;Arial Black&quot;"/>
+        <Grid id="Grid00_00" taborder="1" left="0" top="Static_Day00:0" width="225" height="138" binddataset="ds_sch_date" useselcolor="false" scrollbartype="none auto" autofittype="col" oncellclick="Grid00_oncellclick" border="0px none, 1px solid #c4c4c4, 0px none, 0px none">
+          <Formats>
+            <Format id="default">
+              <Columns>
+                <Column size="139"/>
+                <Column size="28"/>
+              </Columns>
+              <Rows>
+                <Row size="30"/>
+              </Rows>
+              <Band id="body">
+                <Cell text="bind:JOB_NAME"/>
+                <Cell col="1" text="bind:COMPLATE_YN" displaytype="checkboxcontrol" edittype="checkbox" checkboxtruevalue="Y" checkboxfalsevalue="N"/>
+              </Band>
+            </Format>
+          </Formats>
+        </Grid>
+        <Static id="Static_Day00_00" taborder="3" text="✨MENU" cssclass="sta_WF_widgetBox01" left="0" top="0" width="225" height="36" style="padding:3 0 0 15;" textAlign="left" font="14px/normal &quot;Arial Black&quot;"/>
+        <Static id="Static_Day00_01" taborder="4" text="✨MEMO" cssclass="sta_WF_widgetBox01" left="0" top="Grid00_00:000" width="225" height="30" style="padding:3 0 0 15;" font="14px/normal &quot;Arial Black&quot;"/>
+        <TextArea id="TextArea00" taborder="5" left="0" top="Static_Day00_01:0" width="225" bottom="0" border="0px none, 1px solid #c4c4c4, 0px none, 0px none"/>
+      </Layout>
+    </Layouts>
+    <Script type="xscript5.1"><![CDATA[
+this.objApp = this.gfnGetApplication();
+
+this.Form_Left_onload = function(obj:nexacro.Form,e:nexacro.LoadEventInfo)
+{
+	// left 메뉴 로드 trasaction
+	var userId = this.objApp.gdsUserInfo.getColumn(0, "userId");	 
+
+	this.fnMenuLoad(userId);	
+
+};
+
+
+
+// common.js처럼 사용하고싶지만 지금은 일단 여기에 모아둠
+this.fnMenuLoad = function(userId){
+	
+	var menuName = "";
+	var strSvcId    = "selectMenu";
+	var strSvcUrl   = "svcUrl::selectMenu.do";
+	var inData      = "";
+	var outData     = "dsMenu=dsMenu";
+	var strArg      = "userId="+userId;
+	var callBackFnc = "fnCallback";
+	
+	this.transaction(strSvcId 
+		,strSvcUrl
+		,inData
+		,outData
+		,strArg
+		,callBackFnc);	
+}
+
+/* 콜백 */
+this.fnCallback = function(svcID, errorCode, errorMsg)
+{
+	switch(svcID) {
+	
+		
+	case "selectMenu":
+	
+		this.objApp.gdsMenu.copyData(this.dsMenu);		
+		//trace(this.dsMenu.saveXML());
+		//this.dsMenu.copyData(this.objApp.gdsMenu);
+		return;
+		
+	}
+};
+
+
+/* 그리드가 클릭 됐을 때 */
+this.Grid00_oncellclick = function(obj:nexacro.Grid,e:nexacro.GridClickEventInfo)
+{
+	// grid에 cell을 클릭 했을 때 화면 열림
+	this.fn_openForm(obj, e);
+};
+
+
+this.fn_openForm = function(obj, e)
+{
+	var objDs = obj.getBindDataset(); //bind되어있는 dataset를 가져옴
+	
+	var sMenuID = objDs.getColumn(e.row, "MENU_ID");
+	var sMenuName = objDs.getColumn(e.row, "MENU_NAME");
+	var sFromURL = objDs.getColumn(e.row, "MENU_URL");
+	
+	// Grid 가 트리 형식일 때 Root Row 에서 특정 Row 까지 각 Row 의 text 속성값을 반환
+	var sTreePath = obj.getTreePath(e.row);		
+	sTreePath = nexacro.replaceAll(sTreePath, ".", ">");
+	
+	if(sFromURL.length <= 0 ) return;
+	
+	var objApp = nexacro.getApplication();	
+	var WorkFrame = objApp.mainframe.VFrameSet.HFrameSet.VFrameSet1.framesetWork;
+	var sFormID = "FORM_"+sMenuID; //childFrame ID 생성
+	
+	// 이미 열어본 페이지인지 확인하여 열려있는 페이지면 그곳으로 focus
+	var arrObj = WorkFrame.all	
+	for( var i=0; i < arrObj.length; i++ ){
+		
+		if(arrObj[i].name == sFormID){
+			
+			arrObj[i].setFocus();
+			return;
+		}
+	}
+	var nWidth = WorkFrame.getOffsetWidth(); // size 알아오는것
+	var nHeight = WorkFrame.getOffsetHeight();
+	
+	var objCF = new ChildFrame(sFormID, 0, 0, nWidth, nHeight); // childFrame 생성
+	WorkFrame.addChild(sFormID, objCF);
+	
+	objCF.set_resizable(true);
+	objCF.set_openstatus("maximize");
+	objCF.set_showtitlebar(false);
+	objCF.set_formurl("FrameBase::Form_Work.xfdl");
+	
+	var objParam = { FORM_ID : sFormID
+					, MENU_ID : sMenuID
+					, MENU_NAME : sMenuName 
+					, FORM_URL : sFromURL
+					, TREE_PATH : sTreePath };
+	objCF.param = objParam;// 변수 설정하여 파라미터 전송
+	
+	objCF.show();
+	
+	// 열린 화면에 대한 정보를 gds_openForm dataset에 저장
+	var nRow = objApp.gdsOpenForm.addRow();
+	
+	objApp.gdsOpenForm.setColumn(nRow, "FORM_ID", sFormID);
+	objApp.gdsOpenForm.setColumn(nRow, "MENU_ID", sMenuID);
+	objApp.gdsOpenForm.setColumn(nRow, "MENU_NAME", sMenuName);
+	objApp.gdsOpenForm.setColumn(nRow, "MENU_URL", sFromURL);
+	
+	// form_MDI에 있는 함수를 호출하여 tab을 쌓음
+	objApp.mainframe.VFrameSet.HFrameSet.VFrameSet1.frameNavi.form.fn_addTab(objParam);
+	
+	
+}
+]]></Script>
+    <Objects>
+      <Dataset id="dsMenu">
+        <ColumnInfo>
+          <Column id="MENU_NO" type="STRING" size="256"/>
+          <Column id="MENU_ID" type="STRING" size="256"/>
+          <Column id="MENU_NAME" type="STRING" size="256"/>
+          <Column id="AUTH" type="STRING" size="256"/>
+          <Column id="etc1" type="STRING" size="256"/>
+          <Column id="etc2" type="STRING" size="256"/>
+          <Column id="etc3" type="STRING" size="256"/>
+          <Column id="UP_MENU" type="STRING" size="256"/>
+          <Column id="LEVEL" type="STRING" size="256"/>
+          <Column id="MENU_URL" type="STRING" size="256"/>
+          <Column id="USE_YN" type="STRING" size="256"/>
+        </ColumnInfo>
+      </Dataset>
+    </Objects>
+  </Form>
+</FDL>

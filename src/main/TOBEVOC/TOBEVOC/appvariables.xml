@@ -1,0 +1,71 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<AppVariables version="2.0">
+  <Datasets>
+    <Dataset id="gdsUserInfo">
+      <ColumnInfo>
+        <Column id="userId" type="STRING" size="256"/>
+        <Column id="userName" type="STRING" size="256"/>
+      </ColumnInfo>
+      <Rows>
+        <Row/>
+      </Rows>
+    </Dataset>
+    <Dataset id="gdsMenu">
+      <ColumnInfo>
+        <Column id="menuNo" type="STRING" size="256"/>
+        <Column id="menuId" type="STRING" size="256"/>
+        <Column id="menuName" type="STRING" size="256"/>
+        <Column id="auth" type="STRING" size="256"/>
+        <Column id="etc1" type="STRING" size="256"/>
+        <Column id="etc2" type="STRING" size="256"/>
+        <Column id="etc3" type="STRING" size="256"/>
+        <Column id="upMenu" type="STRING" size="256"/>
+        <Column id="level" type="STRING" size="256"/>
+        <Column id="menuUrl" type="STRING" size="256"/>
+        <Column id="useYn" type="STRING" size="256"/>
+      </ColumnInfo>
+    </Dataset>
+    <Dataset id="gdsOpenForm">
+      <ColumnInfo>
+        <Column id="FORM_ID" type="STRING" size="256"/>
+        <Column id="MENU_ID" type="STRING" size="256"/>
+        <Column id="MENU_NAME" type="STRING" size="256"/>
+        <Column id="MENU_URL" type="STRING" size="256"/>
+      </ColumnInfo>
+    </Dataset>
+    <Dataset id="gdsOpenBoard">
+      <ColumnInfo>
+        <Column id="NO" type="STRING" size="256"/>
+      </ColumnInfo>
+    </Dataset>
+    <Dataset id="gdsRegularJob">
+      <ColumnInfo>
+        <Column id="JOB_ID" type="STRING" size="256"/>
+        <Column id="JOB_NAME" type="STRING" size="256"/>
+        <Column id="JOB_DATE" type="STRING" size="256"/>
+        <Column id="CRON" type="STRING" size="256"/>
+        <Column id="JOB_CNTN" type="STRING" size="256"/>
+        <Column id="POPUP_NOTI_YN" type="STRING" size="256"/>
+        <Column id="MAIL_NOTI_YN" type="STRING" size="256"/>
+        <Column id="DEL_YN" type="STRING" size="256"/>
+        <Column id="REG_DATE" type="STRING" size="256"/>
+        <Column id="REG_USER" type="STRING" size="256"/>
+        <Column id="UPDATE_DATE" type="STRING" size="256"/>
+        <Column id="UPDATE_USER" type="STRING" size="256"/>
+        <Column id="DATE_CATEGORY" type="STRING" size="256"/>
+        <Column id="SUB_CATEGORY" type="STRING" size="256"/>
+        <Column id="BIMONTHLY_YN" type="STRING" size="256"/>
+        <Column id="WEEK_DETAILS" type="STRING" size="256"/>
+        <Column id="MONTH_DETAILS" type="STRING" size="256"/>
+        <Column id="DAY_DETAILS" type="STRING" size="256"/>
+        <Column id="COMPLATE_YN" type="STRING" size="256"/>
+        <Column id="BEFORE_CRON" type="STRING" size="256"/>
+      </ColumnInfo>
+    </Dataset>
+  </Datasets>
+  <Variables>
+    <Variable id="evUserId"/>
+    <Variable id="evUserNm"/>
+  </Variables>
+  <DataObjects/>
+</AppVariables>

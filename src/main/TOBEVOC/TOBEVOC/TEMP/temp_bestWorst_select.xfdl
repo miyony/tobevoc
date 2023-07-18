@@ -1,0 +1,302 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<FDL version="2.1">
+  <Form id="voc_voc_select" width="1050" height="770" titletext="Best, Worst 사례 조회" dragscrolltype="none" onload="temp_notice_select_onload">
+    <Layouts>
+      <Layout height="770" width="1050">
+        <Static id="Static00" taborder="0" text="W10" left="0" top="0" width="5" height="720" visible="false" background="pink"/>
+        <Static id="title_stat" taborder="1" text="Best, Worst 사례 조회" left="10" top="10" width="207" height="18" onclick="Static01_onclick" cssclass="sta_WF_FrmTitle"/>
+        <Div id="Div00" taborder="2" text="" left="8" top="40" width="1031" height="85" cssclass="div_WF_SearchArea">
+          <Layouts>
+            <Layout>
+              <Static id="sub_stat2" taborder="0" text="제목" left="18" top="43" width="86" height="30" cssclass="sta_WF_LabelTxt"/>
+              <Static id="sub_stat" taborder="2" text="작성일자" left="18" top="9" width="86" height="30" cssclass="sta_WF_LabelTxt"/>
+              <Edit id="search_title_edit" taborder="3" left="106" top="46" width="894" height="30"/>
+              <Static id="sub_stat1" taborder="4" text="작성자" left="522" top="9" width="86" height="30" cssclass="sta_WF_LabelTxt"/>
+              <Div id="calForm" taborder="5" text="Div00" left="106" top="9" width="294" height="30" url="Work::comp_calFromTo.xfdl"/>
+              <Edit id="search_user_edit" taborder="1" left="606" top="9" width="364" height="30"/>
+            </Layout>
+          </Layouts>
+        </Div>
+        <Static id="sub_stat3" taborder="3" text="조회결과" left="10" top="128" width="74" height="50" cssclass="sta_WF_SubtitleDown"/>
+        <Grid id="board_grid" taborder="4" left="6" top="171" width="1034" height="558" binddataset="dsNotice" oncellclick="Grid00_oncellclick">
+          <Formats>
+            <Format id="default">
+              <Columns>
+                <Column size="48" band="left"/>
+                <Column size="405"/>
+                <Column size="100"/>
+                <Column size="138"/>
+                <Column size="100"/>
+                <Column size="138"/>
+                <Column size="67"/>
+              </Columns>
+              <Rows>
+                <Row size="24" band="head"/>
+                <Row size="24"/>
+              </Rows>
+              <Band id="head">
+                <Cell text="NO"/>
+                <Cell col="1" text="제목"/>
+                <Cell col="2" text="작성자"/>
+                <Cell col="3" text="작성일"/>
+                <Cell col="4" text="수정자"/>
+                <Cell col="5" text="수정일"/>
+                <Cell col="6" text="조회수"/>
+              </Band>
+              <Band id="body">
+                <Cell text="bind:rownum" textAlign="center"/>
+                <Cell col="1" text="bind:TITLE"/>
+                <Cell col="2" text="bind:REG_USER"/>
+                <Cell col="3" text="bind:REG_DTTM" calendardateformat="yyyy-MM-dd" displaytype="date"/>
+                <Cell col="4" text="bind:UPDATE_USER"/>
+                <Cell col="5" text="bind:UPDATE_DTTM" displaytype="date" calendardateformat="yyyy-MM-dd"/>
+                <Cell col="6" text="bind:HIT_CNT"/>
+              </Band>
+            </Format>
+          </Formats>
+        </Grid>
+        <Button id="insert_btn" taborder="5" text="등록" top="5" width="65" height="30" onclick="btn_add_onclick" right="5" cssclass="btn_WF_basic02"/>
+        <Button id="init_btn" taborder="6" text="초기화" top="5" width="65" height="30" onclick="btn_del_onclick" right="151" font="13px/normal &quot;Verdana&quot;,&quot;Malgun Gothic&quot;" cssclass="btn_WF_basic02"/>
+        <Button id="select_btn" taborder="7" text="조회" top="5" width="65" height="30" onclick="btn_save_onclick" right="78" cssclass="btn_WF_basic02"/>
+        <Static id="Static00_00" taborder="8" text="W10" left="1040" top="0" width="10" height="720" visible="false" background="pink"/>
+        <Div id="divPage" taborder="9" text="Div01" left="9" top="734" width="1031" height="37" url="cmm::cmmPaging.xfdl"/>
+        <Button id="search_name_btn" taborder="10" left="977" top="49" width="31" height="30" cssclass="btn_WF_inquiry" onclick="search_name_btn_onclick"/>
+        <Edit id="search_userId_edit" taborder="11" left="1054" top="55" width="140" height="20" visible="false"/>
+      </Layout>
+    </Layouts>
+    <Script type="xscript5.1"><![CDATA[/************************************************************************************************
+* FORM 변수 선언 영역
+************************************************************************************************/
+this.fvRecords=0; 			//목록갯수
+this.fvPage=0;	 			//페이지번호
+this.fvRecordsOffset=0;		//시작rownum
+this.fvTotalCount=0;		//전체데이터갯수
+this.fvPageCount=0; 		//실제표출페이지갯수
+
+this.objApp = nexacro.getApplication();
+
+/************************************************************************************************
+* FORM EVENT 영역(onload, onbeforeclose)
+************************************************************************************************/
+this.temp_notice_select_onload = function(obj:nexacro.Form,e:nexacro.LoadEventInfo)
+{
+	this.objApp.gdsOpenBoard.deleteRow(0);
+	this.fnPageInit();
+};
+
+/************************************************************************************************
+* 버튼 영역
+************************************************************************************************/
+/* 조회 버튼 */
+this.btn_save_onclick = function(obj:nexacro.Button,e:nexacro.ClickEventInfo)
+{
+	this.fnPageInit();
+	
+};
+
+
+/* 등록 버튼 */
+this.btn_add_onclick = function(obj:nexacro.Button,e:nexacro.ClickEventInfo)
+{
+	//this.fn_openForm(obj, e);
+	this.go("TEMP::temp_notice_insert.xfdl");
+};
+
+
+/* 초기화 버튼 */
+this.btn_del_onclick = function(obj:nexacro.Button,e:nexacro.ClickEventInfo)
+{
+	var objForm = this.Div00.form.calForm.form;
+	objForm.fnSetFromDate("");
+	objForm.fnSetToDate("");
+	
+	this.search_userId_edit.set_value("");
+	this.Div00.form.search_user_edit.set_value("");
+	this.Div00.form.search_title_edit.set_value("");
+	
+};
+
+
+
+/************************************************************************************************
+* TRANSACTION 영역
+************************************************************************************************/
+/* selectNotice */
+this.selectNotice = function(){
+	var objForm = this.Div00.form.calForm.form;
+	
+	var ststDttm = objForm.fnGetFromDate();
+	var endDttm = objForm.fnGetToDate();
+	var regUser = this.search_userId_edit.text;
+	var title = this.Div00.form.search_title_edit.text;
+	var gubun = "01"; //공지사항 gubun
+	
+	this.dsSearch.clearData();
+	var nRow = this.dsSearch.addRow();
+	
+	this.dsSearch.setColumn(nRow, "STAR_DTTM",ststDttm);
+	this.dsSearch.setColumn(nRow, "END_DTTM",endDttm);
+	this.dsSearch.setColumn(nRow, "GUBUN",gubun);
+	this.dsSearch.setColumn(nRow, "REG_USER",regUser);
+	this.dsSearch.setColumn(nRow, "TITLE",title);
+	this.dsSearch.setColumn(nRow, "records", this.fvRecords); // select할갯수*pageNo
+	//alert(this.dsSearch.getColumn(0, "records"));
+	// 이부분init 제대로 해줘야함
+	this.dsSearch.setColumn(nRow, "recordsOffset", this.fvRecordsOffset)
+		
+	//trace(this.dsSearch.saveXML());	
+	
+	var strSvcId    = "selectNotice";
+	var strSvcUrl   = "svcUrl::selectNotice.do";
+	var inData      = "dsSearch=dsSearch";
+	var outData     = "dsNotice=dsNotice dsPagingInfo=dsPagingInfo";
+	var strArg      = "";
+	var callBackFnc = "fnCallback";
+	
+	this.transaction(strSvcId 
+		,strSvcUrl
+		,inData
+		,outData
+		,strArg
+		,callBackFnc);
+}
+
+
+this.fnCallback = function(svcID, errorCode, errorMsg)
+{
+	switch(svcID) {
+		
+	case "selectNotice":
+	
+		this.fnPagingSetting();
+		
+		break;
+	
+		
+	}
+};
+
+
+/************************************************************************************************
+* 사용자 FUNCTION 영역
+************************************************************************************************/
+/* 게시물 클릭 했을 때 */
+this.Grid00_oncellclick = function(obj:nexacro.Grid,e:nexacro.GridClickEventInfo)
+{
+	this.fn_openForm(obj, e);
+};
+
+
+this.fn_openForm = function(obj, e)
+{
+	var objDs = obj.getBindDataset(); //bind되어있는 dataset를 가져옴
+		
+	this.objApp.gdsOpenBoard.deleteRow(0);
+	this.objApp.gdsOpenBoard.addRow();
+	this.objApp.gdsOpenBoard.setColumn(0,"NO", objDs.getColumn(e.row, "NO"));
+	
+	trace(this.objApp.gdsOpenBoard.saveXML());
+	
+	this.go("TEMP::temp_notice_insert.xfdl");
+}
+
+/* 페이징 */
+this.fnPagingSetting = function ()
+{
+	this.fvTotalCount = nexacro.toNumber(this.dsPagingInfo.getColumn("totalCount")); //전체로우갯수
+	//create page 
+	this.divPage.form.fnCreatePage("fnPagingCallback",
+									this.fvTotalCount,
+									this.fvRecords,
+									this.fvPage,
+									this.fvPageCount);	
+};
+
+/* 페이징콜백 페이징화면에서 눌린페이지 넘겨줌 */
+this.fnPagingCallback = function(nPage, nRecordsOffset)
+{
+	this.fvPage = nPage; 				
+	this.fvRecordsOffset = nRecordsOffset;
+	
+	this.selectNotice(); //조회함수호출
+};
+
+
+ this.fnPageInit = function () {
+ 	this.fvRecords=20; //목록갯수
+	this.fvPage=0;	 								 //페이지번호
+	this.fvRecordsOffset=0;							 //시작rownum
+	this.fvPageCount = 10;	
+	
+	this.selectNotice();
+ };
+
+this.fn_popupSearch = function(sPopId, sRtn)
+{
+	this.search_userId_edit.set_value(""); // 초기화
+	if(sPopId == "userSearch")
+	{
+		if( sRtn.length> 0 )
+		{
+			var arrRtn = sRtn.split(":");		
+			this.Div00.form.search_user_edit.set_value(arrRtn[0]); // edit에 값 세팅
+			this.search_userId_edit.set_value(arrRtn[1]);
+		}		
+	}
+};
+
+/* userPopUp */
+this.search_name_btn_onclick = function(obj:nexacro.Button,e:nexacro.ClickEventInfo)
+{
+	var objCF = new ChildFrame();
+	
+	objCF.init("userSearch", 0, 0, 300, 400, null, null, "cmm::cmmUserPopup.xfdl"); // 초기값 세팅 
+	
+	
+	objCF.set_showtitlebar(true);
+	objCF.set_openalign("center middle"); // childFrame의 위치를 지정하는 속성, 중간에 화면을 위치시킴
+	objCF.set_showstatusbar(false);
+	var objUser = { pStr1 : this.Div00.form.search_user_edit.value};
+	
+	objCF.showModal( this.getOwnerFrame(), objUser, this, "fn_popupSearch" ); 
+};
+]]></Script>
+    <Objects>
+      <Dataset id="dsSearch">
+        <ColumnInfo>
+          <Column id="STAR_DTTM" type="STRING" size="256"/>
+          <Column id="END_DTTM" type="STRING" size="256"/>
+          <Column id="REG_USER" type="STRING" size="256"/>
+          <Column id="TITLE" type="STRING" size="256"/>
+          <Column id="GUBUN" type="STRING" size="256"/>
+          <Column id="records" type="INT" size="256"/>
+          <Column id="recordsOffset" type="INT" size="256"/>
+          <Column id="page" type="INT" size="256"/>
+          <Column id="pageCount" type="INT" size="256"/>
+        </ColumnInfo>
+      </Dataset>
+      <Dataset id="dsNotice">
+        <ColumnInfo>
+          <Column id="TITLE" type="STRING" size="256"/>
+          <Column id="REG_USER" type="STRING" size="256"/>
+          <Column id="REG_DTTM" type="STRING" size="256"/>
+          <Column id="HIT_CNT" type="INT" size="256"/>
+          <Column id="NO" type="INT" size="256"/>
+          <Column id="UPDATE_DTTM" type="STRING" size="256"/>
+          <Column id="UPDATE_USER" type="STRING" size="256"/>
+          <Column id="rownum" type="STRING" size="256"/>
+        </ColumnInfo>
+      </Dataset>
+      <Dataset id="dsPagingInfo">
+        <ColumnInfo>
+          <Column id="totalCount" type="STRING" size="256"/>
+          <Column id="STAR_DTTM" type="STRING" size="256"/>
+          <Column id="END_DTTM" type="STRING" size="256"/>
+          <Column id="REG_USER" type="STRING" size="256"/>
+          <Column id="TITLE" type="STRING" size="256"/>
+          <Column id="GUBUN" type="STRING" size="256"/>
+        </ColumnInfo>
+      </Dataset>
+    </Objects>
+  </Form>
+</FDL>

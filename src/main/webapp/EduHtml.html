@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>투비소프트</title>
+<script type="text/javascript">
+
+if(!window.NEXACROHTML){	
+	window.NEXACROHTML = {};
+}
+
+window.NEXACROHTML.FireUserNotify = function(userdata){ //발생하는 이벤트가 달라짐
+	if(window.NEXACROWEBBROWSER){ //넥사크로웹브라우저일 경우
+		window.NEXACROWEBBROWSER.on_fire_onusernotify(window.NEXACROWEBBROWSER, userdata);
+		
+	}else if(window.nexacro){
+		window.nexacro.fireUserNotify(userdata);
+		
+	}else{
+		window.document.title = userdata;
+		
+	}	
+}
+
+function fn_html(arg){	
+	alert(arg);
+	
+}
+
+function fn_send(){
+	var str = document.getElementById("fullName").value;
+	// nexacro에 event를 발생시켜야함
+	window.NEXACROHTML.FireUserNotify(str);
+}
+
+
+</script>
+</head>
+<body>
+<form action="">
+	<header> Edu Html </header>
+	<table width="400">
+		<tr>
+			<td>name</td>
+			<td>
+				<input type="text" id="fullName" value="NAME_TEXT" >
+			</td>
+		</tr>
+		<tr>
+			<td>dept</td>
+			<td>
+				<select id="deptCode">
+					<option value="01">인사팀</option>
+					<option value="02">총무팀</option>
+					<option value="03">영업팀</option>
+					<option value="04">회계팀</option>
+				</select>
+			</td>			
+		</tr>
+		<tr>
+			<td>Hire Date</td>
+			<td>
+				<input type="date" id="hireDate" value="20220625" >
+			</td>
+		</tr>
+		<tr>
+			<td>Memo</td>
+			<td>
+				<textarea rows="4" cols="30" id="memo">Htmp Page Text</textarea>
+			</td>
+		</tr>
+	</table>
+	<p>
+		<input type="button" value="send" onclick="fn_send()">
+	</p>
+</form>
+</body>
+</html>

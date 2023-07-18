@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper
+	namespace="com.tobevoc.voc.common.service.mapper.MenuMapper">
+
+	<select id="selectMenu" parameterType="map" resultType="map">
+		/* selectMenu sql */
+		WITH recursive CTE AS (
+		SELECT MENU_NO
+			, MENU_ID
+			, UP_MENU
+			, MENU_NAME
+			, AUTH
+			, REG_USER
+			, REG_DTTM
+			, ETC1
+			, ETC2
+			, ETC3
+			, MENU_URL
+			, USE_YN
+			, 0 as LEVEL
+		FROM TB_MENU
+		WHERE UP_MENU = '00000'
+		
+		UNION ALL
+
+		SELECT A.MENU_NO
+			, A.MENU_ID
+			, A.UP_MENU
+			, A.MENU_NAME
+			, A.AUTH
+			, A.REG_USER
+			, A.REG_DTTM
+			, A.ETC1
+			, A.ETC2
+			, A.ETC3
+			, A.MENU_URL
+			, A.USE_YN
+			, 1 + LEVEL as LEVEL
+		FROM TB_MENU A
+		INNER JOIN CTE ON A.UP_MENU = CTE.MENU_ID )
+
+		SELECT MENU_NO
+			, MENU_ID
+			, UP_MENU
+			, LEVEL
+			, MENU_NAME
+			, AUTH
+			, REG_USER
+			, REG_DTTM
+			, ETC1
+			, ETC2
+			, ETC3
+			, MENU_URL
+			, USE_YN
+		FROM CTE
+		WHERE 1=1
+		AND USE_YN = "Y"
+		<if test="userId != null and userId != ''">
+			AND MENU_ID in (select menu_id from tb_auth where USER_ID = #{userId})
+		</if>
+		ORDER BY MENU_ID
+	</select>
+	
+	<select id="selectMenuAuth" parameterType="map" resultType="map">
+		/* selectMenuAuth sql */
+		select NO
+			 , USER_ID
+			 , MENU_ID			 
+			 , (SELECT NAME FROM TB_USER WHERE USER_ID = a.USER_ID ) AS USER_NAME
+			 , (SELECT DEPT_CODE FROM TB_USER where USER_ID = a.USER_ID ) AS DEPT_CODE	
+		FROM TB_AUTH a
+		WHERE 1=1
+			AND MENU_ID = #{MENU_ID}		
+	</select>
+	
+	<insert id="insertMenuAuth" useGeneratedKeys="true" keyProperty="NO" parameterType="map">
+		/* "insertMenuAuth" sql */	
+		INSERT INTO TB_AUTH(MENU_ID, USER_ID) VALUES	
+		<foreach collection="list" item="item" separator=","> 
+			(#{item.MENU_ID}, #{item.USER_ID}) 
+		</foreach>
+	</insert>
+	
+	<insert id="saveMenu" useGeneratedKeys="true" keyProperty="MENU_NO" parameterType="map">
+		/* saveMenu sql */		
+		INSERT INTO TB_MENU
+		     ( MENU_ID
+		     , MENU_NAME
+		     , AUTH
+		     , REG_USER
+		     , REG_DTTM
+		     , ETC1
+		     , ETC2
+		     , ETC3
+		     , UP_MENU
+		     , MENU_URL
+		     , USE_YN
+		     )
+		 VALUES
+		     ( #{MENU_ID}
+		     , #{MENU_NAME}
+		     , #{AUTH}
+		     , #{REG_USER}
+		     , #{REG_DTTM}
+		     , #{ETC1}
+			 , #{ETC2}
+			 , #{ETC3}
+			 , #{UP_MENU}
+			 , #{MENU_URL}
+			 , #{USE_YN})
+	</insert>
+	
+	<update id="updateMenu" parameterType="map">
+		/* updateMenu sql */	
+		UPDATE TB_MENU
+		   SET  MENU_ID = #{MENU_ID}
+		     , MENU_NAME = #{MENU_NAME}
+		     , AUTH = #{AUTH}
+		     , ETC1 = #{ETC1}
+		     , ETC2 = #{ETC2}
+		     , ETC3 = #{ETC3}
+		     , UP_MENU = #{UP_MENU}
+		     , MENU_URL = #{MENU_URL}
+		 WHERE MENU_NO = #{MENU_NO}
+	</update>
+	
+	<update id="deleteMenu" parameterType="String">
+		/* deleteMenu sql */	
+		UPDATE TB_MENU
+		  SET USE_YN = 'N'
+		 WHERE MENU_NO = #{MENU_NO}
+	</update>
+	
+	<delete id="deleteMenuAuth" parameterType="map">
+		/* deleteMenuAuth sql */	
+		DELETE
+		 FROM TB_AUTH
+		 WHERE MENU_ID = #{MENU_ID}
+		 <if test="USER_ID != null and USER_ID != ''">
+		 AND USER_ID = #{USER_ID}
+		 </if>
+	</delete>
+
+</mapper>

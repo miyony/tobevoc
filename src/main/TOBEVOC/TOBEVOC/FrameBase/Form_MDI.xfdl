@@ -1,0 +1,126 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<FDL version="2.1">
+  <Form id="Form_MDI" width="1053" height="35" titletext="New Form" onload="Form_MDI_onload" background="#F5F7FC" scrolltype="none" scrollbartype="none none">
+    <Layouts>
+      <Layout height="35" mobileorientation="landscape" width="1053">
+        <Button id="btn_Home" taborder="0" text="" left="-7" top="4" width="56" height="31" cssclass="btn_MDI_Home" onclick="btn_Home_onclick"/>
+        <Tab id="tab_mdi" taborder="1" tabindex="0" left="47" top="8" width="776" height="31" onchanged="tab_mdi_onchanged" showextrabutton="true" onextrabuttonclick="tab_mdi_onextrabuttonclick">
+          <Tabpages>
+            <Tabpage id="Tabpage2" text="Tabpage2"/>
+          </Tabpages>
+        </Tab>
+        <Div id="Div00" taborder="2" text="Div00" top="8" width="143" height="24" cssclass="div_WF_Area" border="0px none" right="7">
+          <Layouts>
+            <Layout>
+              <Button id="btn_maximize" taborder="0" top="3" width="23" height="21" cssclass="btn_MDI_Max" onclick="fn_arrange" left="5"/>
+              <Button id="btn_cascade" taborder="1" top="3" width="23" height="21" cssclass="btn_MDI_Min" onclick="fn_arrange" left="32"/>
+              <Button id="btn_horizontal" taborder="2" top="3" width="23" height="21" cssclass="btn_MDI_H" onclick="fn_arrange" left="59"/>
+              <Button id="btn_vertical" taborder="3" top="3" width="23" height="21" cssclass="btn_MDI_V" onclick="fn_arrange" left="86"/>
+              <Button id="btn_closeAll" taborder="4" top="3" width="21" height="21" cssclass="btn_MDI_Allx" onclick="fn_arrange" left="113"/>
+            </Layout>
+          </Layouts>
+        </Div>
+      </Layout>
+    </Layouts>
+    <Script type="xscript5.1"><![CDATA[this.objApp = nexacro.getApplication();
+
+this.Form_MDI_onload = function(obj:nexacro.Form,e:nexacro.LoadEventInfo)
+{
+	this.tab_mdi.removeTabpage(0); // tab Page 지워줌
+	
+};
+
+// tabPage 추가 
+// 이 함수는 완전 다른frame에서 호출 Form_Left
+this.fn_addTab = function(objParam)
+{
+	this.tab_mdi.insertTabpage(objParam.FORM_ID, -1, "", objParam.MENU_NAME);
+	// id, 삽입된 위치(-1 = 맨마지막), TabpageControl 에 연결할 Form 의 URL , TabButton 에 표시할 텍스트
+}
+	
+this.tab_mdi_onchanged = function(obj:nexacro.Tab,e:nexacro.TabIndexChangeEventInfo)
+{
+	
+	var sFormID = obj.tabpages[e.postindex].name; // tabPage ID
+	this.objApp.mainframe.VFrameSet.HFrameSet.VFrameSet1.framesetWork[sFormID].form.setFocus();
+	
+};
+
+// x누르면 닫힘
+this.tab_mdi_onextrabuttonclick = function(obj:nexacro.Tab,e:nexacro.TabMouseEventInfo)
+{
+	var sFormID = obj.tabpages[e.index].name;
+	
+	obj.removeTabpage(e.index); // tab page 지움
+	this.objApp.mainframe.VFrameSet.HFrameSet.VFrameSet1.framesetWork[sFormID].form.close(); //tab page 종료
+	
+	var nRow = this.objApp.gds_openForm.findRow("FORM_ID", sFormID);
+	this.objApp.gds_openForm.deleteRow(nRow);
+	
+};
+
+
+// 버튼 눌렀을 때
+this.fn_arrange = function(obj:nexacro.Button,e:nexacro.ClickEventInfo)
+{
+	var WorkFrame = this.objApp.mainframe.VFrameSet.HFrameSet.VFrameSet1.framesetWork; // console 찍어볼 것
+	var arrObj = WorkFrame.all; // 전부
+	var sType = obj.name.replace("btn_", "") // obj.name = btn_cascade, btn_horizontal .. 등이므로 replace함
+	
+	if( sType == "maximize"){
+		for( var i = 0; i<arrObj.length; i++){
+			WorkFrame.frames[i].set_openstatus(sType); // workframe의 i번째의 창크기를 설정
+			WorkFrame.frames[i].set_border("0px none;");
+		}	
+		
+	}else if(sType == "closeAll"){
+		for( var i = arrObj.length-1; i >= 0; i--){ // 뒤부터 지워줌(역순)
+			arrObj[i].form.close(); // tab 닫아줌
+			this.tab_mdi.removeTabpage(i); // tab 지워줌	
+		}
+		this.objApp.gds_openFrom.clearData(); // dataset에 있는 data를 지워줌
+	
+	}else{
+		WorkFrame.arrange(sType);
+		
+		for( var i = 0; i<arrObj.length; i++){
+			WorkFrame.frames[i].set_border("1px solid black"); 	
+		}
+	}
+	
+	
+};
+
+this.allClose = function(){
+	var WorkFrame = this.objApp.mainframe.VFrameSet.HFrameSet.VFrameSet1.framesetWork;
+	var arrObj = WorkFrame.all; // 전부
+	
+	for( var i = arrObj.length-1; i >= 0; i--){ // 뒤부터 지워줌(역순)
+			arrObj[i].form.close(); // tab 닫아줌
+			this.tab_mdi.removeTabpage(i); // tab 지워줌	
+		}
+		this.objApp.gds_openFrom.clearData(); // dataset에 있는 data를 지워줌
+	
+}
+
+//해당 form을 활성화시킴
+this.fn_tabFocus = function(sFromID)
+{
+	for(var i = 0; i<this.tab_mdi.getTabpageCount(); i++){
+		if(this.tab_mdi.tabpages[i].name == sFromID){
+			this.tab_mdi.set_tabindex(i);  //?뭐야이거...존나 모르는거 많이나옴...;
+			// TabPag 중 화면에 표시되고 있는 TabPage의 인덱스를 갖는 속성입니다
+			return;
+		}
+	}
+}
+
+//main으로 감
+this.btn_Home_onclick = function(obj:nexacro.Button,e:nexacro.ClickEventInfo)
+{
+	this.objApp.mainframe.VFrameSet.HFrameSet.VFrameSet1.set_separatesize("35,0,*");
+	
+};
+]]></Script>
+  </Form>
+</FDL>

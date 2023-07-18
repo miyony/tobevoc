@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper
+	namespace="com.tobevoc.voc.common.service.mapper.StatMapper">
+
+	<select id="selectStat01" resultType="map">
+		/* selectStat01 sql */
+		SELECT date_format(REG_DTTM, '%Y-%m') as 'Month', count(*) as 'Count'
+		FROM tb_voc_main
+		GROUP BY date_format(REG_DTTM, '%Y-%m')
+	</select>
+	
+	<select id="selectStat02" resultType="map">
+		/* selectStat02 sql */
+		SELECT date_format(REG_DTTM, '%Y-%m') as 'Month', count(*) as 'Count'
+		FROM tb_voc_main
+		WHERE VOC_STAT = '3'
+		GROUP BY date_format(REG_DTTM, '%Y-%m')
+	</select>
+	
+	<select id="selectStat03" resultType="map">
+		/* selectStat03 sql */
+		SELECT count(voc_id) as Count,
+		(case 
+ 		when CHRG_USER = 'test' then '우영우'
+ 		when CHRG_USER = 'test123' then '최수연'
+ 		when CHRG_USER = '123' then '이준호'
+ 		when CHRG_USER = '1111' then '권민우'
+ 		else 'not'
+		end) as chrgUser
+		FROM tb_voc_main
+		GROUP BY chrgUser
+	</select>
+	
+	<select id="selectStat04" resultType="map">
+		/* selectStat03 sql */
+		SELECT count(voc_id) as Count,
+		(case 
+ 		when voc_type = 'LCL001' then '제품, 서비스'
+ 		when voc_type = 'LCL002' then '파트너쉽'
+ 		when voc_type = 'LCL003' then '유지보수'
+ 		when voc_type = 'LCL004' then '교육문의'
+ 		else 'not'
+ 		end) as VocType
+		FROM tb_voc_main
+		GROUP BY VocType
+	</select>
+	
+
+</mapper>

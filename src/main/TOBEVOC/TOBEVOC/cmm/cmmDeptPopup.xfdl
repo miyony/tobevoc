@@ -1,0 +1,129 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<FDL version="2.1">
+  <Form id="cmmDeptPopup" width="330" height="400" titletext="부서 조회" onload="cmmUserPopup_onload">
+    <Layouts>
+      <Layout height="400" width="330">
+        <Static id="title_stat" taborder="0" text="부서 조회" left="10" top="10" width="107" height="18" onclick="Static01_onclick" cssclass="sta_WF_FrmTitle"/>
+        <Div id="Div00" taborder="1" text="" left="9" top="40" width="313" height="50" cssclass="sta_WF_box01">
+          <Layouts>
+            <Layout>
+              <Static id="sub_stat" taborder="0" text="부서명" left="4" top="8" width="98" height="30" cssclass="sta_WF_LabelTxt"/>
+              <Edit id="search_edit" taborder="1" left="72" top="9" width="230" height="30"/>
+            </Layout>
+          </Layouts>
+        </Div>
+        <Button id="btn_select" taborder="2" text="조회" top="5" width="65" height="30" right="7" onclick="btn_select_onclick" cssclass="btn_WF_basic02"/>
+        <Grid id="user_grid" taborder="3" left="7" top="99" width="315" height="292" binddataset="dsDept" oncelldblclick="Grid00_oncelldblclick">
+          <Formats>
+            <Format id="default">
+              <Columns>
+                <Column size="43"/>
+                <Column size="256"/>
+              </Columns>
+              <Rows>
+                <Row size="24" band="head"/>
+                <Row size="24"/>
+              </Rows>
+              <Band id="head">
+                <Cell text="NO"/>
+                <Cell col="1" text="부서명"/>
+              </Band>
+              <Band id="body">
+                <Cell text="expr:dataset.rowcount - rowidx"/>
+                <Cell col="1" text="bind:DEPT_NAME"/>
+              </Band>
+            </Format>
+          </Formats>
+        </Grid>
+      </Layout>
+    </Layouts>
+    <Objects>
+      <Dataset id="dsDept">
+        <ColumnInfo>
+          <Column id="DEPT_CD" type="STRING" size="256"/>
+          <Column id="DEPT_NAME" type="STRING" size="256"/>
+          <Column id="UP_DEPT" type="STRING" size="256"/>
+          <Column id="LEVEL" type="STRING" size="256"/>
+        </ColumnInfo>
+      </Dataset>
+      <Dataset id="dsPos">
+        <ColumnInfo>
+          <Column id="POS_CD" type="STRING" size="256"/>
+          <Column id="POS_NAME" type="STRING" size="256"/>
+        </ColumnInfo>
+      </Dataset>
+      <Dataset id="dsSearch">
+        <ColumnInfo>
+          <Column id="POS_CODE" type="STRING" size="256"/>
+          <Column id="NAME" type="STRING" size="256"/>
+          <Column id="DEPT_CODE" type="STRING" size="256"/>
+          <Column id="DEPT_NAME" type="STRING" size="256"/>
+        </ColumnInfo>
+        <Rows>
+          <Row/>
+        </Rows>
+      </Dataset>
+    </Objects>
+    <Script type="xscript5.1"><![CDATA[/************************************************************************************************
+* FORM 변수 선언 영역
+************************************************************************************************/
+
+
+/************************************************************************************************
+* FORM EVENT 영역(onload, onbeforeclose)
+************************************************************************************************/
+this.cmmUserPopup_onload = function(obj:nexacro.Form,e:nexacro.LoadEventInfo)
+{
+	var sParam1 = this.parent.pStr1;
+	this.selectDept(sParam1);
+};
+
+
+/************************************************************************************************
+* 버튼 영역
+************************************************************************************************/
+/* 조회 버튼 */
+this.btn_select_onclick = function(obj:nexacro.Button,e:nexacro.ClickEventInfo)
+{
+	var sParam1 = this.Div00.form.search_edit.text;
+	this.selectDept(sParam1);
+};
+
+/************************************************************************************************
+* TRANSACTION 영역
+************************************************************************************************/
+/* selectDept */
+this.selectDept = function(sParam1){	
+	this.dsSearch.setColumn(0, "DEPT_NAME",sParam1);
+	
+	var strSvcId    = "selectDept";
+	var strSvcUrl   = "svcUrl::selectDept.do";
+	var inData      = "dsSearch=dsSearch";
+	var outData     = "dsDept=dsDept";
+	var strArg      = "";
+	var callBackFnc = "fnCallback";
+	
+	this.transaction(strSvcId 
+		,strSvcUrl
+		,inData
+		,outData
+		,strArg
+		,callBackFnc);
+
+}
+
+/************************************************************************************************
+* 사용자 FUNCTION 영역
+************************************************************************************************/
+/* grid 더블 클릭 시 */
+this.Grid00_oncelldblclick = function(obj:nexacro.Grid,e:nexacro.GridClickEventInfo)
+{
+	var sCode = this.dsDept.getColumn(e.row, "DEPT_NAME")+":"+this.dsDept.getColumn(e.row, "DEPT_CD");
+	this.close(sCode);
+	
+};
+
+
+]]></Script>
+  </Form>
+</FDL>

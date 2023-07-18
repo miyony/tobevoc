@@ -1,0 +1,88 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<FDL version="2.1">
+  <Form id="EduComm_CalFromTo" width="280" height="30" titletext="New Form" onload="EduComm_CalFromTo_onload">
+    <Layouts>
+      <Layout height="30" mobileorientation="landscape" width="280">
+        <Calendar id="cal_from" taborder="0" left="0" top="0" width="120" height="30" ondropdown="calondropdown" dateformat="yyyy-MM-dd" popuptype="none"/>
+        <Static id="Static00_00" taborder="2" text="~" left="cal_from:5" top="0" width="30" height="30" textAlign="center"/>
+        <Calendar id="cal_to" taborder="1" left="Static00_00:5" top="0" height="30" ondropdown="calondropdown" dateformat="yyyy-MM-dd" width="120" popuptype="none"/>
+        <PopupDiv id="pdiv01" text="pdiv01" visible="false" left="0" top="40" width="310" height="198" border="1px solid" background="white">
+          <Layouts>
+            <Layout>
+              <Calendar id="pCalFrom" taborder="0" left="2" top="6" width="150" height="150" type="monthonly" ondayclick="pdiv01_pCalFrom_ondayclick" onchanged="pdiv01_pCalFrom_onchanged"/>
+              <Calendar id="pCalTo" taborder="1" left="155" top="6" width="150" height="150" type="monthonly" ondayclick="pdiv01_pCalTo_ondayclick"/>
+              <Button id="btn00" taborder="2" text="확인" left="82" top="166" width="64" height="21" onclick="pdiv01_btn00_onclick"/>
+              <Button id="btn01" taborder="3" text="취소" left="159" top="167" width="60" height="21" onclick="pdiv01_btn01_onclick"/>
+            </Layout>
+          </Layouts>
+        </PopupDiv>
+      </Layout>
+    </Layouts>
+    <Bind>
+      <BindItem id="item0" compid="pdiv01.form.pCalFrom" propid="value" datasetid="ds01" columnid="COL_FR"/>
+      <BindItem id="item1" compid="pdiv01.form.pCalTo" propid="value" datasetid="ds01" columnid="COL_TO"/>
+    </Bind>
+    <Script type="xscript5.1"><![CDATA[
+
+/************************************************************************************************
+* 사용자 FUNCTION 영역
+************************************************************************************************/
+
+this.calondropdown = function(obj:nexacro.Calendar,e:nexacro.EventInfo)
+{
+	this.pdiv01.form.pCalFrom.set_value(this.cal_from.value);
+	//popupDiv에 있는 pcalFrom달력에 calFrom날짜를 띄움
+	this.pdiv01.form.pCalTo.set_value(this.cal_to.value);
+	
+	// 달력을 눌렀을 때 밑에 popupDiv를 띄움
+	this.pdiv01.trackPopupByComponent(this.cal_from, 0, obj.height); // popupDiv를 컴퍼넌트 기준으로 띄움
+	// this.calFrom 기준, left, top
+	
+};
+
+	/* 확인 버튼 클릭 시 */
+this.pdiv01_btn00_onclick = function(obj:nexacro.Button,e:nexacro.ClickEventInfo)
+{
+	var sFr = this.pdiv01.form.pCalFrom.value;	
+	var sTo = this.pdiv01.form.pCalTo.value;
+	
+	this.cal_from.set_value(sFr);
+	this.cal_to.set_value(sTo);
+	
+	this.pdiv01.closePopup(); // popupDiv 닫음!
+
+};
+
+
+/* 이 기능을 다른곳에서 호출해서 값을 가져올 수 있도록
+ getter를 만듬*/
+ this.fnGetFromDate = function(){
+	
+	return this.cal_from.value;
+	
+ }
+ 
+ this.fnGetToDate = function(){
+	
+	return this.cal_to.value;
+	
+ }
+ 
+ this.fnSetFromDate = function (sValue) {
+ 	this.cal_from.set_value(sValue);
+		
+ };
+ 
+  this.fnSetToDate = function (sValue) {
+ 	this.cal_to.set_value(sValue);	
+	
+ };
+
+this.EduComm_CalFromTo_onload = function(obj:nexacro.Form,e:nexacro.LoadEventInfo)
+{
+	this.cal_to.set_value(this.gfnGetDate());
+	this.cal_from.set_value(this.gfnGetFirstDate());
+};
+]]></Script>
+  </Form>
+</FDL>

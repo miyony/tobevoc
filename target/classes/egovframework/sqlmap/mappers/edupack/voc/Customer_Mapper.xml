@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper
+	namespace="com.tobevoc.voc.common.service.mapper.CustomerMapper">
+
+	<select id="selectCust" parameterType="map" resultType="map">
+		/* selectCust sql */
+		select CUST_NO
+			 , CUST_ID
+			 , CUST_NAME
+			 , COMPANY
+		     , JOB_POSITION
+		     , EMAIL
+		     , PHONE
+		FROM TB_CUSTOMER
+		WHERE 1=1
+		<if test="CUST_NAME != null and CUST_NAME != ''">
+			AND CUST_NAME LIKE CONCAT('%', #{CUST_NAME},'%')
+		</if>
+		<if test="CUST_ID != null and CUST_ID != ''">
+			AND CUST_ID LIKE CONCAT('%', #{CUST_ID},'%')
+		</if>
+		ORDER BY CUST_NO DESC
+	</select>
+	
+	
+
+</mapper>

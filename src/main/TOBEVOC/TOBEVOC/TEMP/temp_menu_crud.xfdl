@@ -1,0 +1,347 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<FDL version="2.1">
+  <Form id="temp_menu_crud" width="1050" height="770" titletext="메뉴 관리" onload="temp_menu_crud_onload">
+    <Layouts>
+      <Layout height="770" width="1050">
+        <Static id="Static00" taborder="0" text="W10" left="0" top="0" width="5" height="720" visible="false" background="pink"/>
+        <Static id="Static00_00" taborder="1" text="W10" left="1040" top="0" width="10" height="720" visible="false" background="pink"/>
+        <Static id="title_stat" taborder="2" text="메뉴 관리" left="10" top="10" width="150" height="19" onclick="Static01_onclick" cssclass="sta_WF_FrmTitle"/>
+        <Button id="btn_save" taborder="3" text="저장" top="5" width="65" height="30" right="6" onclick="btn_save_onclick" cssclass="btn_WF_basic02"/>
+        <Button id="del_btn" taborder="4" text="삭제" top="5" width="65" height="30" right="152" font="13px/normal &quot;Verdana&quot;,&quot;Malgun Gothic&quot;" onclick="del_btn_onclick" cssclass="btn_WF_basic02"/>
+        <Static id="sub_stat14" taborder="5" text="메뉴정보" left="526" top="28" width="89" height="50" cssclass="sta_WF_SubtitleDown"/>
+        <Static id="sub_stat2" taborder="6" text="메뉴 ID" left="523" top="75" width="120" height="42" cssclass="sta_WF_DetailEssential"/>
+        <Static id="sub_stat13" taborder="7" text="" left="642" top="280" width="398" height="42" cssclass="sta_WF_DetailArea"/>
+        <Static id="sub_stat3" taborder="8" text="메뉴명" left="523" top="116" width="120" height="42" cssclass="sta_WF_DetailEssential"/>
+        <Static id="sub_stat6" taborder="9" text="ETC2" left="523" top="239" width="120" height="42" cssclass="sta_WF_DetailLabel"/>
+        <Static id="sub_stat8" taborder="10" text="" left="642" top="75" width="398" height="42" cssclass="sta_WF_DetailArea"/>
+        <Static id="sub_stat9" taborder="11" text="" left="642" top="116" width="398" height="42" cssclass="sta_WF_DetailArea"/>
+        <Static id="sub_stat7" taborder="12" text="ETC3" left="523" top="280" width="120" height="42" cssclass="sta_WF_DetailLabel"/>
+        <Static id="sub_stat12" taborder="13" text="" left="642" top="239" width="398" height="42" cssclass="sta_WF_DetailArea"/>
+        <Edit id="edt2_edit" taborder="14" left="648" top="245" width="260" height="30" enable="true"/>
+        <Grid id="menu_grid" taborder="15" left="6" top="75" width="507" height="685" binddataset="dsMenu" treeinitstatus="expand,all" treeusecheckbox="false" treeuseline="false" treeuseimage="true" oncellposchanged="menu_grid_oncellposchanged">
+          <Formats>
+            <Format id="default">
+              <Columns>
+                <Column size="500"/>
+              </Columns>
+              <Rows>
+                <Row size="33"/>
+              </Rows>
+              <Band id="body">
+                <Cell displaytype="treeitemcontrol" edittype="tree" text="bind:MENU_NAME" treelevel="bind:LEVEL" tooltiptext="bind:MENU_NAME" treestartlevel="0"/>
+              </Band>
+            </Format>
+          </Formats>
+        </Grid>
+        <Static id="sub_stat1" taborder="16" text="메뉴" left="10" top="28" width="74" height="50" cssclass="sta_WF_SubtitleDown"/>
+        <Static id="sub_stat5" taborder="17" text="ETC1" left="523" top="198" width="120" height="42" cssclass="sta_WF_DetailLabel"/>
+        <Static id="sub_stat11" taborder="18" text="" left="642" top="198" width="398" height="42" cssclass="sta_WF_DetailArea"/>
+        <Button id="btn_insert" taborder="19" text="추가" top="5" width="65" height="30" onclick="btn_insert_onclick" right="79" cssclass="btn_WF_basic02"/>
+        <Edit id="edt3_edit" taborder="20" left="648" top="286" width="260" height="30" enable="true"/>
+        <Edit id="menu_name_edit" taborder="21" left="648" top="122" width="260" height="30" enable="true"/>
+        <Edit id="etc_edit" taborder="22" left="648" top="204" width="260" height="30" enable="true"/>
+        <Edit id="menu_id_edit" taborder="23" left="648" top="81" width="260" height="30" enable="true"/>
+        <Button id="up_btn" taborder="24" left="454" top="48" width="27" height="24" onclick="up_btn_onclick" cssclass="btn_WF_btnUp"/>
+        <Button id="down_btn" taborder="25" left="485" top="48" width="27" height="24" onclick="down_btn_onclick" cssclass="btn_WF_btnDown"/>
+        <Static id="sub_stat16" taborder="26" text="" left="642" top="157" width="398" height="42" cssclass="sta_WF_DetailArea"/>
+        <Edit id="menu_url_edit" taborder="27" left="648" top="163" width="260" height="30" enable="true"/>
+        <Static id="sub_stat15" taborder="28" text="메뉴 URL" left="523" top="157" width="120" height="42" cssclass="sta_WF_DetailLabel"/>
+      </Layout>
+    </Layouts>
+    <Script type="xscript5.1"><![CDATA[
+/************************************************************************************************
+* FORM 변수 선언 영역
+************************************************************************************************/
+this.objApp = nexacro.getApplication();
+
+
+/************************************************************************************************
+* FORM EVENT 영역(onload, onbeforeclose)
+************************************************************************************************/
+
+this.temp_menu_crud_onload = function(obj:nexacro.Form,e:nexacro.LoadEventInfo)
+{
+	this.selectMenu();	
+};
+
+/************************************************************************************************
+* 버튼 영역
+************************************************************************************************/
+
+/* 추가 버튼 */
+this.btn_insert_onclick = function(obj:nexacro.Button,e:nexacro.ClickEventInfo)
+{
+	var dsCnt = this.dsMenu.getRowCount();
+	var menuIdArr = []; 
+	var menuId = ""		
+	// 글쓴이
+	var regUser = this.objApp.gdsUserInfo.getColumn(0, "userId");
+		
+	for(var i =0; i<=dsCnt; i++){
+		menuId = this.dsMenu.getColumn(i, "MENU_ID");
+		menuIdArr.push(menuId);
+	}
+	if(!menuIdArr.some(function(elem,index,arr){
+		return elem == "0";
+	})){
+		var nRow = this.dsMenu.addRow(); // 행 추가
+		this.dsMenu.setColumn(nRow, "UP_MENU"  , "00000");
+		this.dsMenu.setColumn(nRow, "LEVEL", "0");
+		this.dsMenu.setColumn(nRow, "REG_USER", regUser);
+		this.dsMenu.setColumn(nRow, "REG_DTTM", this.gfnGetDate());
+		this.dsMenu.setColumn(nRow, "USE_YN", "Y");
+	}else{
+		alert("행은 한개만 추가할 수 있습니다.");
+	}	
+	
+};
+
+this.del_btn_onclick = function(obj:nexacro.Button,e:nexacro.ClickEventInfo)
+{
+	var getText =  this.del_btn.text;
+	if(getText == "줄삭제"){
+		if(!this.dsMenu.getColumn(this.dsMenu.rowposition, "MENU_NAME")){
+			this.dsMenu.deleteRow(this.dsMenu.rowposition);
+		}		
+	}else{ // 메뉴삭제
+		if(this.confirm("선택한 메뉴를 삭제하시겠습니까?")){
+			var fromRow = this.dsMenu.rowposition;
+			var toRow = this.dsDelete.addRow();
+			this.dsDelete.copyRow(toRow, this.dsMenu, fromRow);
+			//alert(this.dsDelete.saveXML());
+			this.deleteMenu();
+		}
+	}
+};
+
+/* menu up 버튼 */
+this.up_btn_onclick = function(obj:nexacro.Button,e:nexacro.ClickEventInfo)
+{
+	var num = this.dsMenu.rowposition;
+	//alert("up: "+num);
+	
+	var a = this.dsMenu.getColumn(num, "MENU_ID");
+	var b = this.dsMenu.getColumn(num, "MENU_NAME");
+	var c = this.dsMenu.getColumn(num-1, "LEVEL");
+	var d = this.dsMenu.getColumn(num-1, "UP_MENU");
+	
+	// 글쓴이
+	var regUser = this.objApp.gdsUserInfo.getColumn(0, "userId");
+	
+	if(num > 0){
+		var bl  = this.dsMenu.deleteRow(num);
+	}
+	
+	if(bl){
+		var ar = this.dsMenu.insertRow(num-1)
+		this.dsMenu.setColumn(num-1, "MENU_ID"  , a);
+		this.dsMenu.setColumn(num-1, "MENU_NAME", b);
+		this.dsMenu.setColumn(num-1, "LEVEL"    , c);
+		this.dsMenu.setColumn(num-1, "UP_MENU"  , d);
+		this.dsMenu.setColumn(num-1, "REG_USER"  , regUser);
+		this.dsMenu.setColumn(num-1, "REG_DTTM"  , this.gfnGetDate());
+		this.dsMenu.setColumn(num-1, "USE_YN"  , "Y");
+	}
+	
+	
+};
+
+/* menu down 버튼 */
+this.down_btn_onclick = function(obj:nexacro.Button,e:nexacro.ClickEventInfo)
+{
+	var num = this.dsMenu.rowposition;
+	//alert("down: "+num);
+	//alert(this.dsMenu.rowcount-1);
+	
+	// 글쓴이
+	var regUser = this.objApp.gdsUserInfo.getColumn(0, "userId");
+	
+	var a = this.dsMenu.getColumn(num, "MENU_ID");
+	var b = this.dsMenu.getColumn(num, "MENU_NAME");
+	var c = this.dsMenu.getColumn(num+1, "LEVEL");
+	var d = this.dsMenu.getColumn(num+1, "UP_MENU");
+	
+	var bl = true;
+	if(num == this.dsMenu.rowcount){
+		bl = false;
+	}
+	
+	if(bl){
+		this.dsMenu.deleteRow(num);
+		var ar = this.dsMenu.insertRow(num+1);
+		this.dsMenu.setColumn(num+1, "MENU_ID"  , a);
+		this.dsMenu.setColumn(num+1, "MENU_NAME", b);
+		this.dsMenu.setColumn(num+1, "LEVEL"    , c);
+		this.dsMenu.setColumn(num+1, "UP_MENU"  , d);
+		this.dsMenu.setColumn(num+1, "REG_USER"  , regUser);
+		this.dsMenu.setColumn(num+1, "REG_DTTM"  , this.gfnGetDate());
+		this.dsMenu.setColumn(num+1, "USE_YN"  , "Y");
+	
+	}else{
+		this.dsMenu.deleteRow(num);
+		var ar = this.dsMenu.addRow();
+		this.dsMenu.setColumn(ar, "MENU_ID"  , a);
+		this.dsMenu.setColumn(ar, "MENU_NAME", b);
+		this.dsMenu.setColumn(ar, "LEVEL"    , "0");
+		this.dsMenu.setColumn(ar, "UP_MENU"  , "00000");
+		this.dsMenu.setColumn(ar, "REG_USER"  , regUser);
+		this.dsMenu.setColumn(ar, "REG_DTTM"  , this.gfnGetDate());
+		this.dsMenu.setColumn(ar, "USE_YN"  , "Y");
+	}	
+};
+
+/* 저장 버튼 */
+this.btn_save_onclick = function(obj:nexacro.Button,e:nexacro.ClickEventInfo)
+{
+	this.saveMenu()
+	
+};
+
+
+/************************************************************************************************
+* TRANSACTION 영역
+************************************************************************************************/
+/* selectMenu */
+this.selectMenu = function(){
+	
+	var userId = "";
+	var strSvcId    = "selectMenu";
+	var strSvcUrl   = "svcUrl::selectMenu.do";
+	var inData      = "";
+	var outData     = "dsMenu=dsMenu";
+	var strArg      = "userId="+userId;
+	var callBackFnc = "fnCallback";
+	
+	this.transaction(strSvcId 
+		,strSvcUrl
+		,inData
+		,outData
+		,strArg
+		,callBackFnc);	
+}
+
+/* saveMenu */
+this.saveMenu = function(){
+
+	var strSvcId    = "saveMenu";
+	var strSvcUrl   = "svcUrl::saveMenu.do";
+	var inData      = "dsMenu=dsMenu:u";
+	var outData     = "";
+	var strArg      = "";
+	var callBackFnc = "fnCallback";
+	
+	this.transaction(strSvcId 
+		,strSvcUrl
+		,inData
+		,outData
+		,strArg
+		,callBackFnc);			
+}
+
+/* deleteMenu */
+this.deleteMenu = function(){
+	
+	var strSvcId    = "deleteMenu";
+	var strSvcUrl   = "svcUrl::deleteMenu.do";
+	var inData      = "dsDelete=dsDelete";
+	var outData     = "";
+	var strArg      = "";
+	var callBackFnc = "fnCallback";
+	
+	this.transaction(strSvcId 
+		,strSvcUrl
+		,inData
+		,outData
+		,strArg
+		,callBackFnc);			
+}
+
+
+this.fnCallback = function(svcID, errorCode, errorMsg)
+{
+	switch(svcID) {
+			
+	case "selectMenu":
+		//trace(this.dsMenu.saveXML());
+		
+		return;
+		
+	case "saveMenu" :
+		alert("저장되었습니다");
+		this.selectMenu();
+		// 좌측메뉴 리로드
+	
+		return;
+		
+	case "deleteMenu":
+		alert("삭제되었습니다");
+		this.dsMenu.filter("");
+		this.selectMenu();	
+		return;
+		
+	}
+};
+
+
+/************************************************************************************************
+* 사용자 FUNCTION 영역
+************************************************************************************************/
+
+/* 메뉴grid가 바뀔 때 마다 column data 확인하여 변경 */
+this.menu_grid_oncellposchanged = function(obj:nexacro.Grid,e:nexacro.GridSelectEventInfo)
+{	
+	
+	var menuYn = this.dsMenu.getColumn(e.row, "USE_YN");
+	//alert(menuYn);
+	if(menuYn == "Y"){
+		this.del_btn.set_text("삭제");
+	}else{		
+		this.del_btn.set_text("줄삭제");
+	}
+	
+};
+
+]]></Script>
+    <Objects>
+      <Dataset id="dsMenu">
+        <ColumnInfo>
+          <Column id="MENU_ID" type="STRING" size="256"/>
+          <Column id="MENU_NAME" type="STRING" size="256"/>
+          <Column id="AUTH" type="STRING" size="256"/>
+          <Column id="etc1" type="STRING" size="256"/>
+          <Column id="etc2" type="STRING" size="256"/>
+          <Column id="etc3" type="STRING" size="256"/>
+          <Column id="UP_MENU" type="STRING" size="256"/>
+          <Column id="LEVEL" type="STRING" size="256"/>
+          <Column id="MENU_URL" type="STRING" size="256"/>
+          <Column id="USE_YN" type="STRING" size="256"/>
+          <Column id="REG_USER" type="STRING" size="256"/>
+          <Column id="REG_DTTM" type="STRING" size="256"/>
+          <Column id="MENU_NO" type="STRING" size="256"/>
+        </ColumnInfo>
+      </Dataset>
+      <Dataset id="dsDelete">
+        <ColumnInfo>
+          <Column id="MENU_ID" type="STRING" size="256"/>
+          <Column id="MENU_NAME" type="STRING" size="256"/>
+          <Column id="AUTH" type="STRING" size="256"/>
+          <Column id="etc1" type="STRING" size="256"/>
+          <Column id="etc2" type="STRING" size="256"/>
+          <Column id="etc3" type="STRING" size="256"/>
+          <Column id="UP_MENU" type="STRING" size="256"/>
+          <Column id="LEVEL" type="STRING" size="256"/>
+          <Column id="MENU_URL" type="STRING" size="256"/>
+          <Column id="USE_YN" type="STRING" size="256"/>
+          <Column id="REG_USER" type="STRING" size="256"/>
+          <Column id="REG_DTTM" type="STRING" size="256"/>
+          <Column id="MENU_NO" type="STRING" size="256"/>
+        </ColumnInfo>
+      </Dataset>
+    </Objects>
+    <Bind>
+      <BindItem id="item0" compid="menu_id_edit" propid="value" datasetid="dsMenu" columnid="MENU_ID"/>
+      <BindItem id="item1" compid="menu_name_edit" propid="value" datasetid="dsMenu" columnid="MENU_NAME"/>
+      <BindItem id="item3" compid="menu_url_edit" propid="value" datasetid="dsMenu" columnid="MENU_URL"/>
+    </Bind>
+  </Form>
+</FDL>

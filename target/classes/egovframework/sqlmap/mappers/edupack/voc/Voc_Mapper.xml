@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >	
+
+<mapper namespace="com.tobevoc.voc.mainvoc.service.mapper.VocMapper">  
+
+	<select id="selectVoc" parameterType="map" resultType="map">
+		/* selectVoc sql */
+		select B.* 
+		FROM (select @rw:=@rw+1 as rownum, A.*
+		FROM (SELECT VOC_ID
+			 , VOC_TYPE
+			 , QSTN_TITLE
+			 , QSTN_CNTN
+			 , INDUSTRY_TYPE
+			 , QUESTION_TYPE
+			 , PLATFORM_TYPE
+			 , VOC_STAT
+			 , REG_DTTM
+			 , (SELECT NAME FROM TB_USER WHERE USER_ID = REG_USER) AS REG_USER
+			 , END_DTTM
+			 , PROC_DTTM
+			 , DEVICE
+			 , QSTN_ATTACH_YN
+			 , CUST_ID
+			 , HIT_CNT
+			 , ANSW_TITLE
+			 , ANSW_CNTN
+			 , ANSW_DTTM
+			 , ANSW_ATTACH_YN
+			 , (SELECT NAME FROM TB_USER WHERE USER_ID = CHRG_USER) AS CHRG_USER
+			 , CHRG_USER AS CHRG_USER_ID
+			 , ANSW_TYPE
+		FROM TB_VOC_MAIN
+		WHERE DEL_YN = 'N'
+		<if test="CHRG_USER != null and CHRG_USER != ''">
+			AND CHRG_USER = #{CHRG_USER}
+		</if>
+		<if test="QSTN_TITLE != null and QSTN_TITLE != ''">
+			AND QSTN_TITLE LIKE CONCAT('%', #{QSTN_TITLE},'%')
+		</if>
+		<if test="STAR_DTTM != null and STAR_DTTM != ''">
+			AND REG_DTTM BETWEEN #{STAR_DTTM} AND #{END_DTTM}
+		</if>
+		<if test="VOC_STAT != null and VOC_STAT != ''">
+			AND VOC_STAT = #{VOC_STAT}
+		</if>
+		<if test="REQ_CHRG_USER != null and REQ_CHRG_USER != ''">
+			AND VOC_ID IN (select VOC_ID from tb_voc_history H where H.REQ_CHRG_USER = #{REQ_CHRG_USER} AND H.END_DTTM IS null AND HISTORY_STAT = '2')
+		</if>
+		ORDER BY VOC_ID DESC, REG_DTTM DESC) A,
+		(select @rw:=0) as r) B
+		ORDER BY rownum DESC limit #{records} offset #{recordsOffset}
+	</select>
+	
+	<select id="selectVocCount" parameterType="map" 	resultType="map">
+		select count(*) as totalCount
+		FROM TB_VOC_MAIN
+		WHERE DEL_YN = 'N'
+		<if test="CHRG_USER != null and CHRG_USER != ''">
+			AND CHRG_USER LIKE CONCAT('%', #{CHRG_USER},'%')
+		</if>
+		<if test="QSTN_TITLE != null and QSTN_TITLE != ''">
+			AND QSTN_TITLE LIKE CONCAT('%', #{QSTN_TITLE},'%')
+		</if>
+		<if test="STAR_DTTM != null and STAR_DTTM != ''">
+			AND REG_DTTM BETWEEN #{STAR_DTTM} AND #{END_DTTM}
+		</if>
+		<if test="VOC_STAT != null and VOC_STAT != ''">
+			AND VOC_STAT = #{VOC_STAT}
+		</if>
+		<if test="REQ_CHRG_USER != null and REQ_CHRG_USER != ''">
+			AND VOC_ID IN (select VOC_ID from tb_voc_history H where H.REQ_CHRG_USER = #{REQ_CHRG_USER} AND H.END_DTTM IS null AND HISTORY_STAT = '2')
+		</if>
+		ORDER BY VOC_ID DESC, REG_DTTM DESC;
+	</select>
+	
+	<select id="detailVoc" parameterType="String" resultType="map">
+		/* detailBoard sql */
+		select VOC_ID
+			 , VOC_TYPE
+			 , QSTN_TITLE
+			 , QSTN_CNTN
+			 , INDUSTRY_TYPE
+			 , QUESTION_TYPE
+			 , PLATFORM_TYPE
+			 , VOC_STAT
+			 , REG_DTTM
+			 , (SELECT NAME FROM TB_USER WHERE USER_ID = REG_USER) AS REG_USER
+			 , END_DTTM
+			 , PROC_DTTM
+			 , DEVICE
+			 , QSTN_ATTACH_YN
+			 , HIT_CNT
+			 , ANSW_TITLE
+			 , ANSW_CNTN
+			 , ANSW_DTTM
+			 , ANSW_ATTACH_YN
+			 , (SELECT NAME FROM TB_USER WHERE USER_ID = CHRG_USER) AS CHRG_USER
+			 , CHRG_USER AS CHRG_USER_ID
+			 , ANSW_TYPE
+			 , CUST_ID
+		FROM TB_VOC_MAIN
+		WHERE DEL_YN = 'N'
+		AND VOC_ID = #{no}		
+	</select>
+	
+	<select id="detailHistory" parameterType="map" resultType="map">
+		/* detailHistory sql */
+		select VOC_ID
+			 , HISTORY_STAT
+			 , (SELECT NAME FROM TB_USER WHERE USER_ID = CHRG_USER) AS CHRG_USER
+			 , CHRG_USER AS CHRG_USER_ID
+			 , REQ_CHRG_USER
+			 , END_DTTM
+			 , REG_DTTM
+			 , REQ_CNTN
+			 , MEMO
+		FROM TB_VOC_HISTORY
+		WHERE VOC_ID = #{VOC_ID}
+		AND HISTORY_STAT = #{HISTORY_STAT}
+		AND CHRG_USER = #{CHRG_USER}
+		AND END_DTTM IS NULL
+	</select>
+
+
+	
+	
+	<insert id="insertVoc" useGeneratedKeys="true" keyProperty="VOC_ID" parameterType="map">
+		/* insertVoc sql */	
+		<selectKey keyProperty="VOC_ID" resultType="String" order="BEFORE">
+			select REGEXP_REPLACE(now(),'[^[:digit:]]','') from dual
+		</selectKey>
+		INSERT INTO TB_VOC_MAIN
+		     ( VOC_ID
+		     , VOC_TYPE
+		     , QSTN_TITLE
+		     , QSTN_CNTN
+		     , INDUSTRY_TYPE
+		     , QUESTION_TYPE
+		     , PLATFORM_TYPE
+		     , VOC_STAT
+		     , REG_DTTM
+		     , REG_USER
+		     , DEVICE
+		     , QSTN_ATTACH_YN
+		     , HIT_CNT
+		     , CHRG_USER
+		     , ANSW_TYPE
+		     , DEL_YN
+		     , CUST_ID
+		     )
+		 VALUES 
+		     ( #{VOC_ID}
+			 , #{VOC_TYPE}
+			 , #{QSTN_TITLE}
+			 , #{QSTN_CNTN}
+			 , #{INDUSTRY_TYPE}
+			 , #{QUESTION_TYPE}
+			 , #{PLATFORM_TYPE}
+			 , #{VOC_STAT}
+			 , #{REG_DTTM}
+			 , #{REG_USER}
+			 , #{DEVICE}
+			 , #{QSTN_ATTACH_YN}
+			 , #{HIT_CNT}
+			 , #{CHRG_USER}
+			 , #{ANSW_TYPE}
+			 , #{DEL_YN}
+			 , #{CUST_ID}
+			  )  
+	</insert>
+	
+	
+	<insert id="insertChangeChrgUser" parameterType="map">
+		/* insertChangeChrgUser sql */	
+		INSERT INTO TB_VOC_HISTORY
+		     ( VOC_ID
+		     , HISTORY_STAT
+		     , CHRG_USER
+		     , REQ_CHRG_USER
+		     , REG_DTTM
+		     , REQ_CNTN
+		     , MEMO
+		     )
+		 VALUES 
+		     ( #{VOC_ID}
+			 , #{HISTORY_STAT}
+			 , #{CHRG_USER}			 
+			 , #{REQ_CHRG_USER}			 
+			 , #{REG_DTTM}			 
+			 , #{REQ_CNTN}			 
+			 , #{MEMO}			 
+			  )  
+	</insert>
+	
+	
+	<update id="updateVoc" parameterType="map">
+		/* updateVoc sql */	
+		UPDATE TB_VOC_MAIN
+		   SET VOC_TYPE = IFNULL(#{VOC_TYPE},VOC_TYPE)
+			, QSTN_TITLE = IFNULL(#{QSTN_TITLE},QSTN_TITLE)
+			, QSTN_CNTN = IFNULL(#{QSTN_CNTN},QSTN_CNTN)
+			, INDUSTRY_TYPE = IFNULL(#{INDUSTRY_TYPE},INDUSTRY_TYPE)
+			, QUESTION_TYPE = IFNULL(#{QUESTION_TYPE},QUESTION_TYPE)
+			, PLATFORM_TYPE = IFNULL(#{PLATFORM_TYPE},PLATFORM_TYPE)
+			, VOC_STAT = IFNULL(#{VOC_STAT},VOC_STAT)
+			, END_DTTM = IFNULL(#{END_DTTM},END_DTTM)
+			, PROC_DTTM = IFNULL(#{PROC_DTTM},PROC_DTTM)
+			, DEVICE = IFNULL(#{DEVICE},DEVICE)
+			, QSTN_ATTACH_YN = IFNULL(#{QSTN_ATTACH_YN},QSTN_ATTACH_YN)
+			, ANSW_TITLE = IFNULL(#{ANSW_TITLE},ANSW_TITLE)
+			, ANSW_CNTN = IFNULL(#{ANSW_CNTN},ANSW_CNTN)
+			, ANSW_DTTM = IFNULL(#{ANSW_DTTM},ANSW_DTTM)
+			, ANSW_ATTACH_YN = IFNULL(#{ANSW_ATTACH_YN},ANSW_ATTACH_YN)
+			, CHRG_USER = IFNULL(#{CHRG_USER},CHRG_USER)
+			, ANSW_TYPE =IFNULL(#{ANSW_TYPE},ANSW_TYPE)
+			, CUST_ID = IFNULL(#{CUST_ID},CUST_ID)
+		 WHERE VOC_ID = #{VOC_ID}
+	</update>
+	
+	<update id="endVoc" parameterType="map">
+		/* endVoc sql */	
+		UPDATE TB_VOC_MAIN
+		   SET END_DTTM = #{END_DTTM}			
+			, VOC_STAT = #{VOC_STAT}
+		 WHERE VOC_ID = #{VOC_ID}
+	</update>
+	
+	<delete id="deleteVoc" parameterType="map">
+		/* deleteVoc sql */	
+		UPDATE TB_VOC_MAIN
+		  SET DEL_YN = 'Y'
+		 WHERE VOC_ID = #{VOC_ID}
+	</delete>
+	
+	<delete id="changeChrgUser" parameterType="map">
+		/* changeChrgUser sql */	
+		UPDATE TB_VOC_MAIN
+		  SET VOC_STAT = #{VOC_STAT}
+		 WHERE VOC_ID = #{VOC_ID}
+	</delete>
+	
+	
+	<update id="updateHistory" parameterType="map">
+		/* updateHistory sql */	
+		UPDATE TB_VOC_HISTORY
+		   SET END_DTTM = #{END_DTTM}			
+		 WHERE VOC_ID = #{VOC_ID}		 
+			AND HISTORY_STAT = #{HISTORY_STAT}
+			AND CHRG_USER = #{CHRG_USER_ID}
+			AND END_DTTM IS NULL
+	</update>
+	
+	<insert id="insertHistory" parameterType="map">
+		/* insertHistory sql */	
+		INSERT INTO TB_VOC_HISTORY
+		     ( VOC_ID
+		     , HISTORY_STAT
+		     , CHRG_USER
+		     , REQ_CHRG_USER
+		     , REG_DTTM
+		     , REQ_CNTN
+		     , END_DTTM
+		     )
+		 VALUES 
+		     ( #{VOC_ID}
+			 , #{HISTORY_STAT}
+			 , #{CHRG_USER}			 
+			 , #{REQ_CHRG_USER}			 
+			 , #{REG_DTTM}			 
+			 , #{REQ_CNTN}			 
+			 , #{END_DTTM}			 
+			  )  
+	</insert>
+	
+	<select id="selectHistory" parameterType="map" resultType="map">
+		/* selectHistory sql */
+		SELECT VOC_ID
+			 , HISTORY_STAT
+			 , (SELECT NAME FROM TB_USER WHERE USER_ID = CHRG_USER) AS CHRG_USER
+			 , CHRG_USER AS CHRG_USER_ID
+			 , (SELECT NAME FROM TB_USER WHERE USER_ID = REQ_CHRG_USER) AS REQ_CHRG_USER
+			 , REQ_CHRG_USER AS REQ_CHRG_USER_ID
+			 , END_DTTM
+			 , REG_DTTM
+			 , REQ_CNTN
+			 , MEMO
+		FROM TB_VOC_HISTORY
+		WHERE VOC_ID = #{VOC_ID}
+		ORDER BY NO DESC
+	</select>
+	
+	
+</mapper>

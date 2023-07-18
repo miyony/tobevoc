@@ -1,0 +1,166 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<FDL version="2.1">
+  <Form id="Form_Work" width="1050" height="872" titletext="Form_Work" onload="Form_Work_onload" onactivate="Form_Work_onactivate" background="#F5F7FC">
+    <Layouts>
+      <Layout width="1050" height="872" screenid="Desktop_screen">
+        <Button id="btn_myMenu" taborder="0" text="" left="6" top="7" width="33" height="28" cssclass="btn_WT_Mymnu" onclick="btn_myMenu_onclick"/>
+        <Static id="st_title" taborder="2" text="Static00" left="39" top="7" width="739" height="38" cssclass="sta_WF_Navi"/>
+        <Div id="div_work" taborder="1" text="Div00" left="5" top="32" right="5" bottom="0" border="0px none">
+          <Layouts>
+            <Layout/>
+          </Layouts>
+        </Div>
+        <Button id="Button01" taborder="3" text="Button01" left="0" top="320" width="10" height="100" cssclass="btn_LF_Close" onclick="Button01_onclick" visible="false"/>
+      </Layout>
+    </Layouts>
+    <Script type="xscript5.1"><![CDATA[
+this.fv_formID = "";
+this.fv_menuID = "";
+this.fv_menuName = "";
+this.fv_formURL = "";
+
+this.Form_Work_onload = function(obj:nexacro.Form,e:nexacro.LoadEventInfo)
+{
+	var objCF = this.getOwnerFrame(); // 이게뭘까?
+	
+	this.fv_formID = objCF.param.FORM_ID;
+	this.fv_menuID = objCF.param.MENU_ID;
+	this.fv_menuName = objCF.param.MENU_NAME;
+	this.fv_formURL = objCF.param.FORM_URL;
+	
+	this.st_title.set_text(objCF.param.TREE_PATH);
+	this.div_work.set_url(this.fv_formURL);
+
+	this.form_onsize();	
+	
+	// 화면이 load가 될때 즐겨찾기dataset을 확인해줌
+	//var nRow = this.objApp.gds_myMenu.findRow("MENU_ID", this.fv_menuID);	//현재 페이지로 찾음
+	//if(nRow > -1){
+		//this.btn_myMenu.set_cssclass("btn_WT_MymnuS");
+	//}
+	
+	/*권한처리*/
+	//this.fn_menuAuth(this.fv_menuID);
+};
+
+// 스크롤 재갱신
+this.form_onsize = function(obj:Form, e:nexacro.SizeEventInfo)
+{	
+	this.resetScroll();
+}
+
+
+this.fn_menuAuth = function(pMenuID){
+	
+	var sMenuAuth = this.objApp.gds_menu.lookup("MENU_ID", pMenuID, "MENU_AUTH"); 
+	// lookup > 검색 컬럼 / 검색data 값 / 원하는 대상 컬럼
+	// YYYNN
+	
+	if( sMenuAuth == null || sMenuAuth.length == 0 || sMenuAuth == "undefined"){
+		sMenuAuth = "YYYYY";
+	}
+	
+	var arrObj = ["btn_search", "btn_add", "btn_delete", "btn_save", "btn_print"]; //버튼 종류
+		
+	for(var i = 0; i<arrObj.length; i++){
+		var objBtn = this.components[arrObj[i]];
+		
+		if(sMenuAuth.substr(i, 1) == "Y"){
+			//버튼을 활성화
+			
+			// this.all > form에 있는 모든 것(dataset, btn 등 전부 들고옴)을 찾음
+			// this.components > form에 있는 componenet만 찾음
+			
+			objBtn.set_enable(true);
+			
+		}else{
+			//버튼을 비활성화
+			objBtn.set_enable(false);
+		
+		}
+	}
+
+}
+
+
+this.Button00_onclick = function(obj:nexacro.Button,e:nexacro.ClickEventInfo)
+{
+	this.close();
+};
+
+this.objApp = nexacro.getApplication();
+
+// form이 활성화될 때 빌생하는 event
+this.Form_Work_onactivate = function(obj:nexacro.Form,e:nexacro.ActivateEventInfo)
+{
+	// 지금 처음엔 mainFrame이 뜨므로 size변경을 해줘야함
+	this.objApp.mainframe.VFrameSet.HFrameSet.VFrameSet1.set_separatesize("35,*,0");
+	
+	this.objApp.mainframe.VFrameSet.HFrameSet.VFrameSet1.frameNavi.form.fn_tabFocus(this.fv_formID); //fn_tabFocus 함수 호출
+	
+};
+
+/* 즐겨찾기 */
+this.btn_myMenu_onclick = function(obj:nexacro.Button,e:nexacro.ClickEventInfo)
+{
+	var bIsMyMenu = false;
+	var sCssClass = obj.cssclass; //btn_WT_Mymnu, btn_WT_MymnuS 둘중하나 뜸
+	
+	if(sCssClass == "btn_WT_MymnuS") bIsMyMenu = true;
+	
+	if(bIsMyMenu == true){
+		trace(">>>>>>>>>>>>>>>>즐겨찾기 해제!")
+		
+		var nRow = this.objApp.gds_myMenu.findRow("MENU_ID", this.fv_menuID);
+		this.objApp.gds_myMenu.deleteRow(nRow);
+		
+		obj.set_cssclass("btn_WT_Mymnu");
+		
+		
+	
+	}else{
+		trace(">>>>>>>>>>>>>>>>즐겨찾기 추가");
+		
+		var nRow = this.objApp.gds_menu.findRow("MENU_ID", this.fv_menuID); // dataset에서 column찾음
+		var nNewRow = this.objApp.gds_myMenu.addRow();
+		
+		this.objApp.gds_myMenu.copyRow(nNewRow, this.objApp.gds_menu, nRow) // row단위 copy
+		// copy할 dataset row, copy하는dataset, copyDataset row
+		
+		/* 상기랑 같은 code
+		this.objApp.gds_myMenu.setColumn(nNewRow, "MENU_ID", this.fv_menuID);
+		this.objApp.gds_myMenu.setColumn(nNewRow, "MENU_NAME", this.fv_menuName);
+		this.objApp.gds_myMenu.setColumn(nNewRow, "FORM_URL", this.fv_forUrl);
+		*/	
+		
+		obj.set_cssclass("btn_WT_MymnuS");
+	}	
+	
+	nexacro.setPrivateProfile("MY_MENU", this.objApp.gds_myMenu.saveXML());
+	
+};
+
+this.Button01_onclick = function(obj:nexacro.Button,e:nexacro.ClickEventInfo)
+{
+	var btnClick = false;
+	var btnClass = obj.cssclass;
+	
+	if( btnClass == "btn_LF_Close"){ 
+		alert("left창닫아줌");
+		this.Button01.set_cssclass("btn_LF_Open"); // 
+		
+		this.objApp.mainframe.VFrameSet.HFrameSet.set_separatesize("0,*");
+		this.objApp.mainframe.VFrameSet.HFrameSet.VFrameSet1.set_separatesize("35,*,0");
+		
+	}else{
+		alert("left창 열어줌");
+		this.Button01.set_cssclass("btn_LF_Close"); // 
+		
+		this.objApp.mainframe.VFrameSet.HFrameSet.set_separatesize("225,*");
+		this.objApp.mainframe.VFrameSet.HFrameSet.VFrameSet1.set_separatesize("35,*,0");
+	}	
+	
+};
+]]></Script>
+  </Form>
+</FDL>

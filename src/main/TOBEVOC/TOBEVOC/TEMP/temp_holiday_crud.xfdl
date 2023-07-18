@@ -1,0 +1,289 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<FDL version="2.1">
+  <Form id="temp_holiday_crud" width="1050" height="770" titletext="휴가 관리" onload="temp_holiday_crud_onload">
+    <Layouts>
+      <Layout height="770" width="1050">
+        <Static id="Static00" taborder="0" text="W10" left="0" top="0" width="5" height="720" visible="false" background="pink"/>
+        <Static id="Static00_00" taborder="1" text="W10" left="1040" top="0" width="10" height="720" visible="false" background="pink"/>
+        <Static id="title_stat" taborder="2" text="휴가 관리" left="10" top="10" width="150" height="19" onclick="Static01_onclick" cssclass="sta_WF_FrmTitle"/>
+        <Div id="Div00" taborder="3" text="" left="8" top="40" width="1031" height="50" cssclass="sta_WF_box01">
+          <Layouts>
+            <Layout>
+              <Button id="search_btn" taborder="0" left="714" top="10" width="31" height="30" cssclass="btn_WF_inquiry" onclick="search_btn_onclick"/>
+              <Static id="sub_stat" taborder="1" text="성명" left="197" top="9" width="73" height="30" cssclass="sta_WF_LabelTxt"/>
+            </Layout>
+          </Layouts>
+        </Div>
+        <Button id="select_btn" taborder="4" text="검색" top="5" width="65" height="30" right="5" onclick="select_btn_onclick" cssclass="btn_WF_basic02"/>
+        <Calendar id="holiday_calendar" taborder="5" left="22" top="130" width="998" height="620" type="monthonly" ondayclick="Calendar00_ondayclick" innerdataset="dsHoliday" datecolumn="HOLIDAY" backgroundcolumn="COLOR"/>
+        <Edit id="search_edit" taborder="6" left="275" top="50" width="447" height="30"/>
+        <Static id="guide_stat" taborder="7" text="" left="25" top="92" width="607" height="50" font="12px/normal &quot;Verdana&quot;,&quot;Malgun Gothic&quot;"/>
+      </Layout>
+    </Layouts>
+    <Script type="xscript5.1"><![CDATA[/************************************************************************************************
+* FORM 변수 선언 영역
+************************************************************************************************/
+this.objApp = nexacro.getApplication();
+
+
+/************************************************************************************************
+* FORM EVENT 영역(onload, onbeforeclose)
+************************************************************************************************/
+this.temp_holiday_crud_onload = function(obj:nexacro.Form,e:nexacro.LoadEventInfo)
+{
+	this.fnHolidayLoad();
+};
+
+/************************************************************************************************
+* 버튼 영역
+************************************************************************************************/
+
+this.select_btn_onclick = function(obj:nexacro.Button,e:nexacro.ClickEventInfo)
+{
+	this.selectHoliday2();
+};
+
+
+/************************************************************************************************
+* TRANSACTION 영역
+************************************************************************************************/
+
+/* fnHolidayLoad */
+this.fnHolidayLoad = function(){
+	
+	var userName = this.objApp.gdsUserInfo.getColumn(0,"userName");
+	
+	var strSvcId    = "selectHoliday";
+	var strSvcUrl   = "svcUrl::selectHoliday.do";
+	var inData      = "";
+	var outData     = "dsHoliday=dsHoliday";
+	var strArg      = "userName="+userName;
+	var callBackFnc = "fnCallback";
+	
+	this.transaction(strSvcId 
+		,strSvcUrl
+		,inData
+		,outData
+		,strArg
+		,callBackFnc);	
+}
+
+/* selectHoliday2 */
+this.selectHoliday2= function(){
+	var userName = this.search_edit.value;
+	
+	var strSvcId    = "selectHoliday2";
+	var strSvcUrl   = "svcUrl::selectHoliday.do";
+	var inData      = "";
+	var outData     = "dsHoliday=dsHoliday";
+	var strArg      = "userName="+userName;
+	var callBackFnc = "fnCallback";
+	
+	this.transaction(strSvcId 
+		,strSvcUrl
+		,inData
+		,outData
+		,strArg
+		,callBackFnc);	
+	
+}
+
+/* fnHolidayValidation */
+this.fnHolidayValidation = function(){ // 일정이 중복 등록 되지 않도록 검사
+	
+	var strSvcId    = "validationHoliday";
+	var strSvcUrl   = "svcUrl::validationHoliday.do";
+	var inData      = "dsHolidaySave=dsHolidaySave";
+	var outData     = "";
+	var strArg      = "";
+	var callBackFnc = "fnCallback";
+	
+	this.transaction(strSvcId 
+		,strSvcUrl
+		,inData
+		,outData
+		,strArg
+		,callBackFnc);
+}
+
+
+/* fnHolidaySave */ 
+this.fnHolidaySave = function(){
+	
+	var strSvcId    = "saveHoliday";
+	var strSvcUrl   = "svcUrl::saveHoliday.do";
+	var inData      = "dsHolidaySave=dsHolidaySave";
+	var outData     = "";
+	var strArg      = "";
+	var callBackFnc = "fnCallback";
+	
+	this.transaction(strSvcId 
+		,strSvcUrl
+		,inData
+		,outData
+		,strArg
+		,callBackFnc);	
+}
+
+/* fnHolidaydelete */
+this.fnHolidaydelete = function(){
+	
+	var strSvcId    = "deleteHoliday";
+	var strSvcUrl   = "svcUrl::deleteHoliday.do";
+	var inData      = "dsHolidaySave=dsHolidaySave";
+	var outData     = "";
+	var strArg      = "";
+	var callBackFnc = "fnCallback";
+	
+	this.transaction(strSvcId 
+		,strSvcUrl
+		,inData
+		,outData
+		,strArg
+		,callBackFnc);
+}
+
+
+this.fnCallback = function(svcID, errorCode, errorMsg)
+{
+	switch(svcID) {
+		
+	case "selectHoliday":		
+		for(var i=0; i<this.dsHoliday.rowcount; i++){
+			this.dsHoliday.addColumn("COLOR", "STRING");
+			this.dsHoliday.setColumn(i, "COLOR", "#D1B2FF");
+		}
+		
+		this.guideStatic(this.objApp.gdsUserInfo.getColumn(0,"userName"));
+		break;
+		
+	case "deleteHoliday":	
+		
+		alert("선택한 일정이 삭제되었습니다");
+		this.fnHolidayLoad(); // 캘린더 재로드
+		
+		break;
+		
+	case "saveHoliday":			
+		this.fnHolidayLoad(); // 캘린더 재로드
+		
+		break;
+		
+	case "validationHoliday":
+		if(errorCode == -1){
+			if(this.confirm(errorMsg)){
+				this.fnHolidaydelete();
+			}
+		}else{
+			if(this.confirm("선택한 일정을 등록하시겠습니까?")){
+				this.fnHolidaySave();
+			}
+		}
+		break;		
+		
+	case "selectHoliday2":		
+		var userId = this.objApp.gdsUserInfo.getColumn(0,"userId");
+		var searchId = this.dsHoliday.getColumn(0,"USER_ID");
+		
+		//alert("userId: " +userId+", searchId: "+ searchId);
+		
+		for(var i=0; i<this.dsHoliday.rowcount; i++){
+			this.dsHoliday.addColumn("COLOR", "STRING");
+			this.dsHoliday.setColumn(i, "COLOR", "#D1B2FF");
+		}
+		
+		//alert("userId: "+userId+", searchId: "+searchId);
+		if( searchId == userId ){
+			this.holiday_calendar.set_enableevent(true);
+		}else{
+			//alert("달력 읽기전용");
+			this.holiday_calendar.set_enableevent(false);	
+		}	
+		this.guideStatic(this.search_edit.text);
+		
+		break;
+	}
+	
+	
+};
+
+
+/************************************************************************************************
+* 사용자 FUNCTION 영역
+************************************************************************************************/
+this.Calendar00_ondayclick = function(obj:nexacro.Calendar,e:nexacro.CalendarDayClickEventInfo)
+{
+	
+	var selectDay = e.date;	
+	var userId = this.objApp.gdsUserInfo.getColumn(0,"userId");
+	
+	this.dsHolidaySave.setColumn(0, "USER_ID", userId);
+	this.dsHolidaySave.setColumn(0, "HOLIDAY", selectDay);
+	
+	//일정이 중복 등록 되지 않도록 검사
+	this.fnHolidayValidation();
+	
+};
+
+
+this.guideStatic = function(name){
+	
+	this.guide_stat.set_text(name+"님의 휴가일정 입니다. 본인 일정만 등록 가능하고, 타인의 일정은 확인만 가능합니다.");
+	
+}
+
+/* 사원찾기 popup */
+this.search_btn_onclick = function(obj:nexacro.Button,e:nexacro.ClickEventInfo)
+{
+	
+	var objCF = new ChildFrame();
+	
+	objCF.init("userSearch", 0, 0, 300, 400, null, null, "cmm::cmmUserPopup.xfdl"); // 초기값 세팅 
+	
+	
+	objCF.set_showtitlebar(true);
+	objCF.set_openalign("center middle"); // childFrame의 위치를 지정하는 속성, 중간에 화면을 위치시킴
+	objCF.set_showstatusbar(false);
+	var objUser = { pStr1 : this.search_edit.value};
+	
+	objCF.showModal( this.getOwnerFrame(), objUser, this, "fn_popupSearch" ); 
+	
+};
+
+this.fn_popupSearch = function(sPopId, sRtn)
+{
+	if(sPopId == "userSearch")
+	{
+		if( sRtn.length> 0 ){
+			var arrRtn = sRtn.split(":");		
+			this.search_edit.set_value(arrRtn[0]); // edit에 값 세팅
+		}		
+	}
+};
+]]></Script>
+    <Objects>
+      <Dataset id="dsHoliday">
+        <ColumnInfo>
+          <Column id="NO" type="STRING" size="256"/>
+          <Column id="USER_ID" type="STRING" size="256"/>
+          <Column id="HOLIDAY" type="STRING" size="256"/>
+          <Column id="MENO" type="STRING" size="256"/>
+          <Column id="COLOR" type="STRING" size="256"/>
+          <Column id="USER_NAME" type="STRING" size="256"/>
+        </ColumnInfo>
+      </Dataset>
+      <Dataset id="dsHolidaySave">
+        <ColumnInfo>
+          <Column id="USER_ID" type="STRING" size="256"/>
+          <Column id="HOLIDAY" type="STRING" size="256"/>
+        </ColumnInfo>
+        <Rows>
+          <Row/>
+        </Rows>
+      </Dataset>
+    </Objects>
+    <Bind>
+      <BindItem id="item0" compid="search_edit" propid="value" datasetid="dsSearch" columnid="POS_CODE"/>
+    </Bind>
+  </Form>
+</FDL>

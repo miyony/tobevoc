@@ -1,0 +1,116 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<FDL version="2.1">
+  <Form id="frame_Botton" width="1280" height="30" titletext="New Form" scrolltype="none" background="#f1f1f1" ontimer="frame_Botton_ontimer" onload="frame_Botton_onload" stepitemsize="0">
+    <Layouts>
+      <Layout height="30" width="1280" stepcount="0">
+        <Static id="notice_stat" taborder="0" text="" left="10" top="2" width="780" height="25"/>
+      </Layout>
+    </Layouts>
+    <Script type="xscript5.1"><![CDATA[/************************************************************************************************
+* FORM 변수 선언 영역
+************************************************************************************************/
+this.objApp = nexacro.getApplication();
+this.fvStep = 0;
+
+/************************************************************************************************
+* FORM EVENT 영역(onload, onbeforeclose)
+************************************************************************************************/
+this.frame_Botton_onload = function(obj:nexacro.Form,e:nexacro.LoadEventInfo)
+{
+	//this.selectBottomNotice(); //일단 한번 들고옴
+	//this.setTimer("1",900000); // 15분에 한번 갱신
+	//this.set_stepshowtype("action");
+	
+	//this.selectBottomNotice();	
+};
+
+
+/*this.frame_Botton_ontimer = function(obj:nexacro.Form,e:nexacro.TimerEventInfo)
+{
+	//alert("ontimer");
+	if(e.timerid == 0){	
+		//alert("selectBottomNotice");
+		this.selectBottomNotice();
+		
+	}
+};
+*/
+
+/************************************************************************************************
+* TRANSACTION 영역
+************************************************************************************************/
+/* selectBottomNotice */
+this.selectBottomNotice = function(){
+		
+	var strSvcId    = "selectBottomNotice";
+	var strSvcUrl   = "svcUrl::selectBottomNotice.do";
+	var inData      = "";
+	var outData     = "dsNotice=dsNotice";
+	var strArg      = "";
+	var callBackFnc = "fnCallback";
+	
+	this.transaction(strSvcId 
+		,strSvcUrl
+		,inData
+		,outData
+		,strArg
+		,callBackFnc);
+}
+
+
+this.fnCallback = function(svcID, errorCode, errorMsg)
+{
+	switch(svcID) {
+		
+	case "selectBottomNotice":	
+		var cnt = this.dsNotice.rowcount;
+		this.setStepCount(cnt);
+		
+		for(var i=0; i<cnt; i++){
+			//alert("notice"+i);
+			var bottom = new Static("notice_stat0"+i, 10, 2, 780, 25);
+			this.addChild(bottom.name, bottom);
+			//alert(this.dsNotice.getColumn(i-1, "TITLE"));
+			bottom.set_text("📢공지사항 : "+ this.dsNotice.getColumn(i, "TITLE"));	
+			//bottom.set_font("bold 11pt/normal Verdana, Malgun Gothic");
+			bottom.set_positionstep(i);
+			bottom.show();
+		}
+		
+		this.setBottomTime();
+		break;
+	
+	}
+};
+
+this.setBottomTime = function(){
+	this.setTimer(0, 5000);	
+
+}
+
+
+
+this.frame_Botton_ontimer = function(obj:nexacro.Form,e:nexacro.TimerEventInfo){
+	
+	if (e.timerid == 0)	{
+		if (this.fvStep == 2) {
+			this.fvStep = 0;
+			this.stepselector.set_stepindex(0);
+		}
+		else {
+			this.stepselector.set_stepindex(++this.fvStep);
+		}
+	}
+};
+]]></Script>
+    <Objects>
+      <Dataset id="dsNotice">
+        <ColumnInfo>
+          <Column id="TITLE" type="STRING" size="256"/>
+          <Column id="POST_DTTM" type="STRING" size="256"/>
+          <Column id="NO" type="INT" size="256"/>
+        </ColumnInfo>
+      </Dataset>
+    </Objects>
+  </Form>
+</FDL>

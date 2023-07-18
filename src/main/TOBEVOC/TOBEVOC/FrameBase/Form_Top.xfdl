@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<FDL version="2.1">
+  <Form id="Form_Top" width="1278" height="40" titletext="Form_Top" onload="Form_Top_onload" scrollbartype="none none" background="#F5F7FC">
+    <Layouts>
+      <Layout width="1278" height="40" screenid="Desktop_screen">
+        <Static id="Static00" taborder="0" left="10" top="-2" width="230" height="41" text="TOBEVOC💁‍♀" font="normal 35px/normal &quot;Arial Black&quot;" textAlign="center" color="#6836f1" onclick="Static00_onclick"/>
+        <Button id="btnLogOut" taborder="1" text="LOGOUT" top="18" width="62" height="22" right="0" onclick="btnLogOut_onclick" uWord="frame.logOut" cssclass="btn_WF_basic01" font="12px/normal &quot;Arial Black&quot;"/>
+        <Static id="staName" taborder="2" top="16" width="183" height="23" right="btnLogOut:0" cssclass="sta_TF_Welcome" usedecorate="true"/>
+      </Layout>
+    </Layouts>
+    <Script type="xscript5.1"><![CDATA[
+this.objApp = nexacro.getApplication();
+this.Form_Top_onload = function(obj:nexacro.Form,e:nexacro.LoadEventInfo)
+{
+	
+	
+	
+};
+
+
+this.fnLoad = function(){
+	var userName = nexacro.getApplication().gdsUserInfo.getColumn(0, "userName");	
+	this.staName.set_text(userName+"님, 환영합니다🔆");
+
+}
+this.btnLogOut_onclick = function(obj:nexacro.Button,e:nexacro.ClickEventInfo)
+{
+	if(this.confirm("로그아웃 하시겠습니까?")){
+		
+		this.objApp.mainframe.VFrameSet.frameLogin.form.Div00.form.edt_id.set_value("");
+		this.objApp.mainframe.VFrameSet.frameLogin.form.Div00.form.edt_pw.set_value("");
+		
+		this.objApp.mainframe.VFrameSet.set_separatesize("*,0,0,0");
+		this.objApp.mainframe.VFrameSet.HFrameSet.VFrameSet1.frameNavi.form.allClose(); //모두닫기
+		
+		//this.go("FrameBase::Form_Login.xfdl");
+		
+	}
+	
+};
+
+this.Static00_onclick = function(obj:nexacro.Static,e:nexacro.ClickEventInfo)
+{
+	
+};
+]]></Script>
+    <Objects/>
+  </Form>
+</FDL>

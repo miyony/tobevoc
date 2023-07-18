@@ -1,0 +1,183 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<FDL version="2.1">
+  <Form id="cmmUserPopup" width="330" height="450" titletext="담당자변경상세보기" onload="cmmUserPopup_onload">
+    <Layouts>
+      <Layout height="450" width="330">
+        <Static id="title_stat" taborder="0" text="담당자변경 상세보기" left="10" top="10" width="174" height="18" onclick="Static01_onclick" cssclass="sta_WF_FrmTitle"/>
+        <Div id="Div00" taborder="1" text="" left="9" top="40" width="313" height="50" cssclass="sta_WF_box01">
+          <Layouts>
+            <Layout>
+              <Static id="sub_stat" taborder="0" text="요청 담당자" left="4" top="8" width="108" height="30" cssclass="sta_WF_LabelTxt"/>
+              <Edit id="user_name_edit" taborder="1" left="104" top="9" width="194" height="30" enable="false"/>
+            </Layout>
+          </Layouts>
+        </Div>
+        <Button id="btn_save" taborder="2" text="승인" top="400" width="65" height="30" onclick="btn_save_onclick" left="85"/>
+        <TextArea id="detail_textarea" taborder="3" left="10" top="126" width="310" height="264"/>
+        <Static id="sub_stat1" taborder="4" text="요청상세사유" left="10" top="79" width="114" height="50" cssclass="sta_WF_SubtitleDown"/>
+        <Button id="btn_save00" taborder="5" text="반려" top="400" width="65" height="30" right="85" onclick="btn_save00_onclick"/>
+        <Edit id="user_id_edit" taborder="6" left="348" top="21" width="140" height="20" visible="false"/>
+      </Layout>
+    </Layouts>
+    <Objects>
+      <Dataset id="dsUser">
+        <ColumnInfo>
+          <Column id="USER_ID" type="STRING" size="256"/>
+          <Column id="NAME" type="STRING" size="256"/>
+          <Column id="DEPT_CODE" type="STRING" size="256"/>
+          <Column id="POS_CODE" type="STRING" size="256"/>
+        </ColumnInfo>
+      </Dataset>
+      <Dataset id="dsSearch">
+        <ColumnInfo>
+          <Column id="VOC_ID" type="STRING" size="256"/>
+          <Column id="HISTORY_STAT" type="STRING" size="256"/>
+          <Column id="CHRG_USER" type="STRING" size="256"/>
+          <Column id="REQ_CHRG_USER" type="STRING" size="256"/>
+          <Column id="END_DTTM" type="STRING" size="256"/>
+        </ColumnInfo>
+        <Rows>
+          <Row/>
+        </Rows>
+      </Dataset>
+      <Dataset id="dsChageDetail">
+        <ColumnInfo>
+          <Column id="HISTORY_STAT" type="STRING" size="256"/>
+          <Column id="REQ_CHRG_USER" type="STRING" size="256"/>
+          <Column id="REQ_CNTN" type="STRING" size="256"/>
+          <Column id="REG_DTTM" type="STRING" size="256"/>
+          <Column id="CHRG_USER" type="STRING" size="256"/>
+          <Column id="VOC_ID" type="STRING" size="256"/>
+          <Column id="VOC_STAT" type="STRING" size="256"/>
+          <Column id="CHRG_USER_ID" type="STRING" size="256"/>
+          <Column id="END_DTTM" type="STRING" size="256"/>
+          <Column id="MEMO" type="STRING" size="256"/>
+        </ColumnInfo>
+        <Rows>
+          <Row/>
+        </Rows>
+      </Dataset>
+    </Objects>
+    <Script type="xscript5.1"><![CDATA[/************************************************************************************************
+* FORM 변수 선언 영역
+************************************************************************************************/
+
+
+/************************************************************************************************
+* FORM EVENT 영역(onload, onbeforeclose)
+************************************************************************************************/
+this.cmmUserPopup_onload = function(obj:nexacro.Form,e:nexacro.LoadEventInfo)
+{
+	this.detailHistory();
+};
+
+
+/************************************************************************************************
+* 버튼 영역
+************************************************************************************************/
+/* 승인버튼 */
+this.btn_save_onclick = function(obj:nexacro.Button,e:nexacro.ClickEventInfo)
+{
+		
+	if(this.confirm("승인 하시겠습니까?")){		
+		this.dsChageDetail.setColumn(0, "VOC_ID", this.parent.vocId);
+		this.dsChageDetail.addColumn("APV_STAT", "STRING");
+		this.dsChageDetail.setColumn(0, "APV_STAT", "승인");
+		this.dsChageDetail.setColumn(0, "END_DTTM", this.gfnGetDate());	
+		//alert(this.dsChageDetail.saveXML());
+		
+		this.updateHistory();
+	}	
+};
+
+
+/*반려 버튼*/
+this.btn_save00_onclick = function(obj:nexacro.Button,e:nexacro.ClickEventInfo)
+{
+	if(this.confirm("반려 하시겠습니까?")){
+		this.dsChageDetail.setColumn(0, "VOC_ID", this.parent.vocId	);
+		this.dsChageDetail.addColumn("APV_STAT", "STRING");
+		this.dsChageDetail.setColumn(0, "APV_STAT", "반려");
+		this.dsChageDetail.setColumn(0, "END_DTTM", this.gfnGetDate());			
+				
+		this.updateHistory();
+	}
+};
+
+
+
+/************************************************************************************************
+* TRANSACTION 영역
+************************************************************************************************/
+/* detailHistory */
+this.detailHistory = function(){
+	
+	this.dsSearch.setColumn(0, "VOC_ID", this.parent.vocId);
+	this.dsSearch.setColumn(0, "HISTORY_STAT", "2");
+	this.dsSearch.setColumn(0, "CHRG_USER", this.parent.chrgUserId);
+	
+	
+	
+	var strSvcId    = "detailHistory";
+	var strSvcUrl   = "svcUrl::detailHistory.do";
+	var inData      = "dsSearch=dsSearch";
+	var outData     = "dsChageDetail=dsChageDetail";
+	var strArg      = "";
+	var callBackFnc = "fnCallback";
+	
+	this.transaction(strSvcId 
+		,strSvcUrl
+		,inData
+		,outData
+		,strArg
+		,callBackFnc);
+	
+}
+
+
+/* updateHistory */
+this.updateHistory = function(){
+	var strSvcId    = "updateHistory";
+	var strSvcUrl   = "svcUrl::updateHistory.do";
+	var inData      = "dsChageDetail=dsChageDetail";
+	var outData     = "";
+	var strArg      = "";
+	var callBackFnc = "fnCallback";
+	
+	this.transaction(strSvcId 
+		,strSvcUrl
+		,inData
+		,outData
+		,strArg
+		,callBackFnc);
+	
+}
+
+this.fnCallback = function(svcID, errorCode, errorMsg){
+	switch(svcID) {
+	
+	case "updateHistory":
+		if(errorCode == -1){
+			alert(errorMsg);
+			
+		}else if(this.dsChageDetail.getColumn(0, "APV_STAT") == "승인"){
+			alert("승인하였습니다.");
+			this.close();
+			
+		}else if(this.dsChageDetail.getColumn(0, "APV_STAT") == "반려"){
+			alert("반려하였습니다.");
+			this.close();
+		}		
+	
+		break;
+	}
+};
+
+]]></Script>
+    <Bind>
+      <BindItem id="item0" compid="detail_textarea" propid="value" datasetid="dsChageDetail" columnid="MEMO"/>
+      <BindItem id="item2" compid="user_id_edit" propid="value" datasetid="dsChageDetail" columnid="CHRG_USER_ID"/>
+      <BindItem id="item3" compid="Div00.form.user_name_edit" propid="value" datasetid="dsChageDetail" columnid="CHRG_USER"/>
+    </Bind>
+  </Form>
+</FDL>

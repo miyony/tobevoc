@@ -1,0 +1,490 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<FDL version="2.1">
+  <Form id="temp_notice_insert" width="1050" height="770" titletext="공지사항 상세보기" onload="temp_notice_insert_onload">
+    <Layouts>
+      <Layout height="770" width="1050">
+        <Static id="sub_stat1" taborder="0" text="하단 노출 여부" left="7" top="79" width="120" height="42" cssclass="sta_WF_DetailLabel" textAlign="left"/>
+        <Static id="sub_stat2" taborder="2" text="제목" left="7" top="120" width="120" height="42" cssclass="sta_WF_DetailEssential" textAlign="left"/>
+        <Static id="sub_stat3" taborder="3" text="내용" left="7" top="161" width="120" height="449" cssclass="sta_WF_DetailEssential"/>
+        <Static id="sub_stat6" taborder="4" text="" left="126" top="79" width="387" height="42" cssclass="sta_WF_DetailArea"/>
+        <Static id="sub_stat8" taborder="5" text="" left="126" top="120" width="893" height="42" cssclass="sta_WF_DetailArea"/>
+        <Static id="sub_stat9" taborder="6" text="" left="126" top="161" width="893" height="449" cssclass="sta_WF_DetailArea"/>
+        <Static id="sub_stat5" taborder="7" text="상단 게시기간" left="512" top="79" width="120" height="42" cssclass="sta_WF_DetailLabel"/>
+        <Static id="sub_stat7" taborder="8" text="" left="631" top="79" width="388" height="42" cssclass="sta_WF_DetailArea"/>
+        <Edit id="edt_name" taborder="1" left="133" top="126" width="878" height="30"/>
+        <Static id="sub_stat" taborder="9" text="입력사항" left="10" top="29" width="74" height="50" cssclass="sta_WF_SubtitleDown"/>
+        <Static id="Static00" taborder="10" text="W10" left="0" top="0" width="5" height="720" visible="false" background="pink"/>
+        <Static id="Static00_00" taborder="11" text="W10" left="1040" top="0" width="10" height="720" visible="false" background="pink"/>
+        <Static id="title_stat" taborder="12" text="공지사항 등록" left="10" top="10" width="150" height="19" onclick="Static01_onclick" cssclass="sta_WF_FrmTitle"/>
+        <Button id="select_btn" taborder="13" text="목록" top="5" width="65" height="30" right="151" font="13px/normal &quot;Verdana&quot;,&quot;Malgun Gothic&quot;" onclick="select_btn_onclick" cssclass="btn_WF_basic02"/>
+        <Button id="insert_btn" taborder="14" text="저장" top="5" width="65" height="30" onclick="insert_btn_onclick" right="5" cssclass="btn_WF_basic02"/>
+        <CheckBox id="CheckBox00" taborder="15" left="137" top="85" width="150" height="28" falsevalue="N" truevalue="Y" onchanged="CheckBox00_onchanged" text=""/>
+        <Div id="calForm" taborder="16" text="Div00" left="637" top="85" width="294" height="30" url="Work::comp_calFromTo.xfdl"/>
+        <Static id="sub_stat4" taborder="17" text="첨부파일" left="7" top="609" width="120" height="151" cssclass="sta_WF_DetailLabel" textAlign="left"/>
+        <Static id="sub_stat10" taborder="18" text="" left="126" top="609" width="893" height="151" cssclass="sta_WF_DetailArea"/>
+        <Button id="Button00" taborder="19" left="77" top="672" width="29" height="28" cssclass="btn_WF_inquiry" onclick="Button00_onclick"/>
+        <Grid id="file_grid" taborder="20" left="135" top="617" width="875" height="134" binddataset="dsUpload" oncellclick="Grid00_oncellclick">
+          <Formats>
+            <Format id="default">
+              <Columns>
+                <Column size="300"/>
+                <Column size="300"/>
+                <Column size="111"/>
+                <Column size="96"/>
+                <Column size="63"/>
+              </Columns>
+              <Rows>
+                <Row size="24" band="head"/>
+                <Row size="31"/>
+              </Rows>
+              <Band id="head">
+                <Cell text="파일아이디"/>
+                <Cell col="1" text="파일명"/>
+                <Cell col="2" text="확장자"/>
+                <Cell col="3" text="파일크기"/>
+                <Cell col="4"/>
+              </Band>
+              <Band id="body">
+                <Cell text="bind:FILE_ID"/>
+                <Cell col="1" text="bind:FILE_NAME"/>
+                <Cell col="2" text="bind:FILE_TYPE"/>
+                <Cell col="3" text="bind:FILE_SIZE"/>
+                <Cell col="4" displaytype="buttoncontrol" edittype="button" text="삭제" cssclass="btn_WF_DeleteIcon"/>
+              </Band>
+            </Format>
+          </Formats>
+        </Grid>
+        <Button id="del_btn" taborder="21" text="삭제" top="5" width="65" height="30" right="78" font="13px/normal &quot;Verdana&quot;,&quot;Malgun Gothic&quot;" onclick="del_btn_onclick" cssclass="btn_WF_basic02"/>
+      </Layout>
+    </Layouts>
+    <Script type="xscript5.1"><![CDATA[
+/************************************************************************************************
+* FORM 변수 선언 영역
+************************************************************************************************/
+this.objApp = nexacro.getApplication();
+var crud = this.objApp.gdsOpenBoard.rowcount;
+
+/************************************************************************************************
+* FORM EVENT 영역(onload, onbeforeclose)
+************************************************************************************************/
+this.temp_notice_insert_onload = function(obj:nexacro.Form,e:nexacro.LoadEventInfo)
+{
+	
+	this.fnNoticeCheck();
+	var sUrl = "http://localhost:8088/edupack_egov/smartEditor/SmartEditor2.html";
+	var webEditor = new WebBrowser("webEditor", 133, 170, 879, 430);	
+	this.addChild("webEditor", webEditor);
+	webEditor.set_url(sUrl);
+	
+	webEditor.show();	
+	
+	// update인 경우	
+	if(crud == "1"){
+		this.detailBoard();
+		this.insert_btn.set_text("수정");
+		this.title_stat.set_text("공지사항 상세보기");
+		
+		//var postDttm = this.dsUpload.getColumn("0","POST_DTTM");			
+	}	
+};
+
+/************************************************************************************************
+* 버튼 영역
+************************************************************************************************/
+
+/* 저장버튼 */
+this.insert_btn_onclick = function(obj:nexacro.Button,e:nexacro.ClickEventInfo)
+{
+	var crud = this.objApp.gdsOpenBoard.rowcount;
+	//alert(crud);
+	if(crud == "1"){ //수정버튼
+		this.updateBoard();
+		
+	}else{ //저장버튼
+		this.insertBoard();
+	}	
+};
+
+
+/* 삭제버튼 */
+this.del_btn_onclick = function(obj:nexacro.Button,e:nexacro.ClickEventInfo)
+{
+	this.deleteBoard();
+};
+
+
+/* 목록버튼 */
+this.select_btn_onclick = function(obj:nexacro.Button,e:nexacro.ClickEventInfo)
+{
+	this.go("TEMP::temp_notice_select.xfdl");
+};
+
+
+/************************************************************************************************
+* TRANSACTION 영역
+************************************************************************************************/
+
+/* insertBoard */
+this.insertBoard = function(){
+	
+	this.fn_data();
+	
+	var strSvcId    = "insertBoard";
+	var strSvcUrl   = "svcUrl::insertBoard.do";
+	var inData      = "dsBoard=dsBoard:u dsUpload=dsUpload";
+	var outData     = "";
+	var strArg      = "";
+	var callBackFnc = "fnCallback";
+	
+	this.transaction(strSvcId 
+		,strSvcUrl
+		,inData
+		,outData
+		,strArg
+		,callBackFnc);
+}
+
+/* updateBoard */
+this.updateBoard = function(){	
+	this.fn_data();
+	
+	var strSvcId    = "updateBoard";
+	var strSvcUrl   = "svcUrl::updateBoard.do";
+	var inData      = "dsBoard=dsBoard dsUpload=dsUpload:u";
+	var outData     = "";
+	var strArg      = "";
+	var callBackFnc = "fnCallback";
+	
+	this.transaction(strSvcId 
+		,strSvcUrl
+		,inData
+		,outData
+		,strArg
+		,callBackFnc);
+}
+
+/* detailBoard */
+this.detailBoard = function(){
+	
+	var no = this.objApp.gdsOpenBoard.getColumn(0,"NO");
+	
+	var strSvcId    = "detailNotice";
+	var strSvcUrl   = "svcUrl::detailBoard.do";
+	var inData      = "";
+	var outData     = "dsBoard=dsBoard dsUpload=dsUpload";
+	var strArg      = "no='" + no + "'";
+	var callBackFnc = "fnCallback";
+	
+	this.transaction(strSvcId 
+		,strSvcUrl
+		,inData
+		,outData
+		,strArg
+		,callBackFnc);
+	
+}
+
+/* deleteBoard */
+this.deleteBoard = function(){
+	if(this.confirm("삭제하시겠습니까?")){
+		
+		// file db 삭제
+		var strSvcId    = "deleteBoard";
+		var strSvcUrl   = "svcUrl::deleteBoard.do";
+		var inData      = "dsBoard=dsBoard dsUpload=dsUpload";
+		var outData     = "";
+		var strArg      = "";
+		var callBackFnc = "fnCallback";
+		
+		this.transaction(strSvcId 
+			,strSvcUrl
+			,inData
+			,outData
+			,strArg
+			,callBackFnc);	
+	}	
+	
+}
+
+this.fnCallback = function(svcID, errorCode, errorMsg)
+{
+	switch(svcID) {
+		
+	case "insertBoard":
+		
+		if(this.dsUpload.rowcount > 0){ //첨부파일이 있으면 업로드 실행
+			this.fnFileUpload();
+		}
+		
+		alert("등록되었습니다");
+		this.go("TEMP::temp_notice_select.xfdl");
+		
+		break;
+		
+	case "detailNotice":
+		
+		var objDom =this.webEditor.getProperty("document").getProperty("all"); 
+		objDom.getProperty("ir1").setProperty("value", this.dsBoard.getColumn(0, "CNTN"));
+		var date = this.dsBoard.getColumn(0,"POST_DTTM").split(",");
+		var fromDate = date[0];
+		var toDate = date[1];
+		this.calForm.form.fnSetFromDate(fromDate);
+		this.calForm.form.fnSetToDate(toDate);
+		
+		this.fnNoticeCheck();
+		
+		break;
+		
+	case "deleteBoard":
+		
+		if(this.dsUpload.rowcount > 0){ //첨부파일이 있으면 업로드 실행
+			this.fnFileUpload();
+		}
+		
+		
+		alert("삭제되었습니다");
+		this.go("TEMP::temp_notice_select.xfdl");
+		
+		break;
+		
+	case "updateBoard":
+		
+		if(this.dsUpload.rowcount > 0){ //첨부파일이 있으면 업로드 실행
+			this.fnFileUpload();
+		}
+		
+		alert("수정되었습니다");
+		
+		break;
+		
+	}
+};
+
+
+
+/************************************************************************************************
+* 사용자 FUNCTION 영역
+************************************************************************************************/
+
+/* data 가공 */
+this.fn_data = function(){
+	
+	// 네이버에디터 getCntn
+	var objDom =this.webEditor.getProperty("document").getProperty("all"); //editor의 전체 프로퍼티를 받아옴
+	objDom.getProperty("editorGetBtn").callMethod("click");
+	var sData = objDom.getProperty("ir1").getProperty("value");
+	
+	//alert(sData);
+	
+	// 게시기간
+	if(this.CheckBox00.value == 'Y' ){
+		var objForm = this.calForm.form;	
+		var ststDttm = objForm.fnGetFromDate();
+		var endDttm = objForm.fnGetToDate();
+		var postDttm = ststDttm +","+endDttm;
+		
+		this.dsBoard.setColumn(0, "POST_DTTM", postDttm);
+	}
+	
+	var gubun = "01"; //공지사항 gubun
+	
+	// 글쓴이
+	var regUser = this.objApp.gdsUserInfo.getColumn(0, "userId");
+	
+	// 게시판
+	var crud = this.objApp.gdsOpenBoard.rowcount;
+	if(crud == "1"){
+		this.dsBoard.setColumn(0, "UPDATE_DTTM", this.gfnGetDate());
+		this.dsBoard.setColumn(0, "UPDATE_USER", regUser);	
+	}else{
+		this.dsBoard.setColumn(0, "REG_DTTM", this.gfnGetDate());
+		this.dsBoard.setColumn(0, "REG_USER", regUser);
+		this.dsBoard.setColumn(0, "UPDATE_DTTM", this.gfnGetDate());
+		this.dsBoard.setColumn(0, "UPDATE_USER", regUser);	
+	}
+	
+	this.dsBoard.setColumn(0, "CNTN", sData);
+	this.dsBoard.setColumn(0, "GUBUN", gubun);
+	
+	
+	// 파일 다운로드
+	var uploadCnt = this.dsUpload.getRowCount();
+	if(uploadCnt > 0 ){	// 첨부파일 있음
+		this.dsBoard.setColumn(0, "ATTACH_YN", "Y"); 
+		for(var i=0; i<uploadCnt; i++){
+			this.dsUpload.setColumn(i, "REG_DTTM", this.gfnGetDate());
+			this.dsUpload.setColumn(i, "REG_USER", regUser);
+			this.dsUpload.setColumn(i, "FILE_GUBUN", gubun);
+		}	
+	}else{  //첨부파일 없음
+		this.dsBoard.setColumn(0, "ATTACH_YN", "N");
+	}
+	
+}
+
+
+/* 상단 게시할 경우 */
+this.CheckBox00_onchanged = function(obj:nexacro.CheckBox,e:nexacro.CheckBoxChangedEventInfo)
+{
+	this.fnNoticeCheck();
+};
+
+this.fnNoticeCheck = function(){
+	if(this.CheckBox00.value == 'Y' ){
+		this.calForm.set_enable(true);
+	}else{
+		this.calForm.form.fnSetFromDate("");
+		this.calForm.form.fnSetToDate("");
+		this.calForm.set_enable(false);
+	}
+	
+}
+
+
+/* fileUpload */
+this.fnFileUpload = function(){
+	
+	var sUploadUrl = "http://localhost:8088/edupack_egov/fileUpload.do";	
+	this.FileUpTransfer00.upload(sUploadUrl);
+}
+
+/* file upload 로직 */
+this.Button00_onclick = function(obj:nexacro.Button,e:nexacro.ClickEventInfo)
+{
+	this.userFileDialog.open("fileselect", 3, "%UserApp%"); // fileDialog
+	//alert("오니");
+};
+
+this.FileUpTransfer00_onsuccess = function(obj:nexacro.FileUpTransfer,e:nexacro.FileUpTransferEventInfo)
+{
+	var objDs = e.datasets[0];
+	
+	for(var i=0; i< objDs.rowcount; i++){
+		var nRow = this.dsUpload.findRow("FILE_NAME", objDs.getColumn(i, "filename"));
+		if(nRow > -1){
+			this.dsUpload.setColumn(nRow, "FILE_ID", objDs.getColumn(i, "fileid"));
+			this.dsUpload.setColumn(nRow, "FILE_NAME", objDs.getColumn(i, "filename"));
+			this.dsUpload.setColumn(nRow, "FILE_SIZE", objDs.getColumn(i, "filesize"));
+		}
+	}	
+};
+
+this.userFileDialog_onclose = function(obj:nexacro.FileDialog,e:nexacro.FileDialogEventInfo){
+	var objFileList = e.virtualfiles;
+	
+	for(var i=0; i<objFileList.length; i++){ //선택한 파일을 FileUpTransfer에 넣음
+		
+		var bExist = this.FileUpTransfer00.existFile(objFileList[i]); 
+		// 중복으로 들어가지 않게 일단 FileUpTransfer에 있는지 check
+		
+		if(!bExist){ // FileUpTransfer에 없으면
+			var sFileName = objFileList[i].filename;
+			var sTemp = sFileName.lastIndexOf(".") + 1; // 역순으로 "."을 찾아서 인덱스(자리수)를 반환
+			var sFileType = sFileName.substr(sTemp);
+			
+			var nIdx = this.FileUpTransfer00.addFile(sFileName, objFileList[i]); 
+            // FileUpTransfer에 선택한 파일 넣음
+			
+			if(nIdx != -1){
+				var nRow = this.dsUpload.addRow();
+				this.dsUpload.setColumn(nRow, "FILE_ID", sFileName);
+				this.dsUpload.setColumn(nRow, "FILE_NAME", sFileName);
+				this.dsUpload.setColumn(nRow, "FILE_TYPE", sFileType);
+				
+			}		
+		}
+	}
+};
+
+/* 파일업로드 grid 버튼이벤트 */
+this.Grid00_oncellclick = function(obj:nexacro.Grid,e:nexacro.GridClickEventInfo)
+{
+	
+	//var dnCellIdx = 5;
+	var rmCellIdx = 4;
+	
+	/*if(e.col == dnCellIdx){ // 5번째 cell(다운로드버튼)이 눌리면
+	var sFileId = this.dsUpload.getColumn(e.row, "fileid");
+	var sDownUrl = "http://localhost:8088/edupack_egov/filedownload.do";
+	
+	var sFileInfo = "aaa.js, bbb.png, ccc.xml"; // 이상태로 서버로 넘겨서 이걸 잘라서 사용함
+	
+	
+	this.FileDownTransfer00.setPostData("downfilename", sFileId);
+	this.FileDownTransfer00.download(sDownUrl);
+	
+	}else */
+	
+	if(e.col == rmCellIdx){ // 4번째 cell(삭제버튼)이 눌리면
+		var sFileName = this.dsUpload.getColumn(e.row, "FILE_NAME");
+		//alert(sFileName);
+		
+		if(this.gfnIsNull(this.dsUpload.getColumn(e.row, "FILE_SIZE"))){
+			this.dsUpload.deleteRow(e.row);				
+			this.FileUpTransfer00.removeFile(sFileName);
+			
+		}else{
+			// file 서버 삭제
+			this.dsUpload.deleteRow(e.row);
+			
+			var sFileId = this.dsUpload.getColumn(e.row, "FILE_ID");		
+			var sDeleteUrl = "http://localhost:8088/edupack_egov/deleteUploadFile.do";
+			
+			this.gfnTransaction("svcFileDelete"
+				, "deleteUploadFile.do"
+				, ""
+				, ""
+				, "deletefilename="+nexacro.wrapQuote(sFileName)
+				, "fnCallback");	
+			
+			
+		}	
+	}	
+};
+
+
+]]></Script>
+    <Objects>
+      <Dataset id="dsBoard">
+        <ColumnInfo>
+          <Column id="ID" type="STRING" size="256"/>
+          <Column id="GUBUN" type="STRING" size="256"/>
+          <Column id="TITLE" type="STRING" size="256"/>
+          <Column id="CNTN" type="STRING" size="256"/>
+          <Column id="REG_DTTM" type="STRING" size="256"/>
+          <Column id="REG_USER" type="STRING" size="256"/>
+          <Column id="DEL_YN" type="STRING" size="256"/>
+          <Column id="ATTACH_YN" type="STRING" size="256"/>
+          <Column id="CATEGORY" type="STRING" size="256"/>
+          <Column id="NOTICE_YN" type="STRING" size="256"/>
+          <Column id="HIT_CNT" type="STRING" size="256"/>
+          <Column id="POST_DTTM" type="STRING" size="256"/>
+          <Column id="NO" type="INT" size="256"/>
+          <Column id="UPDATE_DTTM" type="STRING" size="256"/>
+          <Column id="UPDATE_USER" type="STRING" size="256"/>
+        </ColumnInfo>
+        <Rows>
+          <Row/>
+        </Rows>
+      </Dataset>
+      <Dataset id="dsUpload">
+        <ColumnInfo>
+          <Column id="FILE_ID" type="STRING" size="256"/>
+          <Column id="FILE_NAME" type="STRING" size="256"/>
+          <Column id="FILE_TYPE" type="STRING" size="256"/>
+          <Column id="FILE_SIZE" type="STRING" size="256"/>
+          <Column id="FILE_GUBUN" type="STRING" size="256"/>
+          <Column id="REG_USER" type="STRING" size="256"/>
+          <Column id="REG_DTTM" type="STRING" size="256"/>
+          <Column id="BOARD_NO" type="STRING" size="256"/>
+        </ColumnInfo>
+      </Dataset>
+      <FileUpTransfer id="FileUpTransfer00" onsuccess="FileUpTransfer00_onsuccess"/>
+      <FileDialog id="userFileDialog" onclose="userFileDialog_onclose"/>
+    </Objects>
+    <Bind>
+      <BindItem id="item0" compid="edt_name" propid="value" datasetid="dsBoard" columnid="TITLE"/>
+      <BindItem id="item1" compid="CheckBox00" propid="value" datasetid="dsBoard" columnid="NOTICE_YN"/>
+    </Bind>
+  </Form>
+</FDL>

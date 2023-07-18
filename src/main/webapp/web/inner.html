@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<style type="text/css">
+
+/* 레이아웃 큰박스 속성*/  
+/* font:normal 12px 돋움; */
+body{font:normal 12px gulim;}
+
+A:link {text-decoration : none ; color : #585858   }
+A:visited {  color : #585858   }
+A:active { text-decoration : none ; color : #585858 }
+A:hover { text-decoration : none ; color : #5652A9  }
+
+</style>
+<script type="text/javascript" src="WebIF.js"></script>
+<script type="text/javascript">  
+var xpCallBackObj;  //WebBrowser 로부터 결과를 전달받을 오브젝트 (XPLATFORM Form)
+var xpCallBackFn;
+
+function setCallback(obj, name)
+{
+    window.NEXACROHTML.Init();
+    
+
+};
+	
+function submitContents(arg) 
+{
+  try {
+      window.NEXACROHTML.FireUserNotify(arg);
+  } catch(e) {
+    	  alert(e + "error");
+  }
+};
+
+
+function ScrollControl() {
+	var xpos = event.wheelDelta;
+    window.NEXACROHTML.FireUserNotify('wheelDelta_' + xpos);
+
+}
+
+document.onmousewheel = ScrollControl;
+</script>
+
+</head>
+<BODY leftmargine=0 topmargine=0 scroll="no" onload="setCallback();">
+
+</BODY>
+</html>

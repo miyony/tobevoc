@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ENV version="2.1">
+  <Environment themeid="theme::TMSN" datatyperule="2.0" userfontid="font::Cafe24SsurroundAir.xfont">
+    <ScreenDefinition>
+      <Screen id="Desktop_screen" type="desktop" themeid="theme::TMSN"/>
+      <Screen id="phone" type="mobile_small" usecontextmenu="none"/>
+    </ScreenDefinition>
+    <Variables/>
+    <Cookies>
+      <Cookie id="userId" secure="false"/>
+    </Cookies>
+    <httpheader/>
+  </Environment>
+</ENV>

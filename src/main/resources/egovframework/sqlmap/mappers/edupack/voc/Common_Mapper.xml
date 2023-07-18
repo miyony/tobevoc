@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >	
+
+<mapper namespace="com.tobevoc.voc.common.service.mapper.CommonMapper">  	
+		
+	
+	<insert id="insertFile" parameterType="java.util.List">
+		/* insertFile sql */		
+		INSERT INTO TB_ATTACH_FILE
+		     ( BOARD_NO
+		     , FILE_ID
+		     , FILE_GUBUN
+		     , FILE_NAME
+		     , REG_USER
+		     , REG_DTTM
+		     , FILE_TYPE
+		     , FILE_SIZE
+		     )
+		 VALUES
+		 <foreach collection="list" item="item" separator=" , ">	 	
+		     ( #{item.BOARD_NO}
+		     , #{item.FILE_ID}
+			 , #{item.FILE_GUBUN}
+			 , #{item.FILE_NAME}
+			 , #{item.REG_USER}
+			 , #{item.REG_DTTM}
+			 , #{item.FILE_TYPE}
+			 , #{item.FILE_SIZE}
+			  )
+		</foreach>
+	</insert>
+	
+	<select id="selectFile" parameterType="map" resultType="map">
+		/* selectFile sql */
+		select FILE_ID
+		     , FILE_GUBUN
+		     , FILE_NAME
+		     , REG_USER
+		     , REG_DTTM
+		     , FILE_TYPE
+		     , FILE_SIZE
+		     , BOARD_NO
+		FROM TB_ATTACH_FILE
+		WHERE BOARD_NO = #{no}		
+	</select>
+	
+	<select id="selectVocFile" parameterType="map" resultType="map">
+		/* selectFile sql */
+		select FILE_ID
+		     , FILE_GUBUN
+		     , FILE_NAME
+		     , REG_USER
+		     , REG_DTTM
+		     , FILE_TYPE
+		     , FILE_SIZE
+		     , BOARD_NO
+		FROM TB_ATTACH_FILE
+		WHERE BOARD_NO = #{BOARD_NO}		
+		AND FILE_GUBUN = #{FILE_GUBUN}		
+	</select>
+	
+	<select id="selectPos" parameterType="String" resultType="map">
+		/* selectPos sql */
+		select POS_CD
+		     , POS_NAME
+		FROM TB_POS
+		
+	</select>
+	
+	<select id="selectDept" parameterType="String" resultType="map">
+		/* selectDept sql */
+		select DEPT_CD
+		     , DEPT_NAME
+		     , UP_DEPT
+		FROM TB_DEPT		
+		WHERE 1=1
+		<if test="DEPT_NAME != null and DEPT_NAME != ''">
+			AND DEPT_NAME LIKE CONCAT('%', #{DEPT_NAME},'%')
+		</if>
+			
+	</select>
+	
+	<delete id="deleteFile" parameterType="java.util.List">
+		/* deleteFile sql */
+		DELETE
+		FROM TB_ATTACH_FILE
+		<where> 
+			<foreach collection="list" item="item" open="" close="" separator="OR"> 
+				(BOARD_NO = #{item.BOARD_NO} AND FILE_NAME = #{item.FILE_NAME})
+			</foreach> 
+		</where> 
+	</delete>
+	
+	<delete id="deleteFile1" parameterType="com.tobevoc.voc.common.vo.attachVO">
+		/* deleteFile1 sql */
+		DELETE
+		FROM TB_ATTACH_FILE
+		WHERE BOARD_NO = #{BOARD_NO} AND FILE_NAME = #{FILE_NAME}
+	</delete>
+	
+	<insert id="insertFile1" parameterType="com.tobevoc.voc.common.vo.attachVO">
+		/* insertFile1 sql */		
+		INSERT INTO TB_ATTACH_FILE
+		     ( BOARD_NO
+		     , FILE_ID
+		     , FILE_GUBUN
+		     , FILE_NAME
+		     , REG_USER
+		     , REG_DTTM
+		     , FILE_TYPE
+		     , FILE_SIZE
+		     )
+		 VALUES
+		     ( #{BOARD_NO}
+		     , #{FILE_ID}
+			 , #{FILE_GUBUN}
+			 , #{FILE_NAME}
+			 , #{REG_USER}
+			 , #{REG_DTTM}
+			 , #{FILE_TYPE}
+			 , #{FILE_SIZE})
+	</insert>
+	
+	
+	<select id="selectCategoryCode" resultType="map">
+		/* selectCategoryCode sql */
+		select CODE_ID
+		     , CODE_NAME
+		     , UP_CODE_ID
+		     , ETC01
+		     , ETC02
+		     , ETC03
+		FROM TB_VOC_CATEGORY
+	</select>
+	
+	<select id="selectComCode" parameterType="String" resultType="map">
+		SELECT CODE
+			, CODE_NAME
+		FROM TB_COMCODE
+		WHERE 1=1
+		AND GROUP_CODE = #{code}
+	
+	</select>
+	
+</mapper>
